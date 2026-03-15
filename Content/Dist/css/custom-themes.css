@@ -1,0 +1,723 @@
+/* ============================================
+   VARIABLES GLOBALES - Tema Claro (Default)
+   Organizadas por categoría funcional
+   ============================================ */
+
+:root {
+    /* --- Transiciones --- */
+    --transition-speed: 0.3s;
+
+    /* --- General / Body --- */
+    --bg-body: #ffffff;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+
+    /* --- Sidebar / Menú --- */
+    --sidebar-bg-start: #0d6efd;
+    --sidebar-bg-end: #0b5ed7;
+    --sidebar-text: rgba(255, 255, 255, 0.9);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-active-bg: rgba(255, 255, 255, 0.2);
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-header-bg: rgba(0, 0, 0, 0.1);
+
+    /* --- Header --- */
+    --header-bg: #ffffff;
+    --header-text: #495057;
+    --header-shadow: rgba(0, 0, 0, 0.1);
+
+    /* --- Cards --- */
+    --card-bg: #ffffff;
+    --card-border: transparent;
+    --card-header-bg: #0d6efd;
+    --card-header-text: #ffffff;
+    --card-shadow-hover: rgba(0, 0, 0, 0.15);
+
+    /* --- Botones --- */
+    --btn-primary-bg: #0d6efd;
+    --btn-primary-hover: #0b5ed7;
+    --btn-toggle-border: #dee2e6;
+    --btn-toggle-text: #495057;
+    --btn-toggle-hover-bg: #f8f9fa;
+    --btn-toggle-hover-border: #0d6efd;
+    --btn-toggle-hover-text: #0d6efd;
+
+    /* --- Dropdown --- */
+    --dropdown-bg: #ffffff;
+    --dropdown-text: #212529;
+    --dropdown-hover-bg: #0d6efd;
+    --dropdown-hover-text: #ffffff;
+    --dropdown-border: transparent;
+    --dropdown-shadow: rgba(0, 0, 0, 0.1);
+    --dropdown-divider: #dee2e6;
+
+    /* --- Footer --- */
+    --footer-bg: #232323;
+    --footer-text: #ffffff;
+    --footer-text-muted: rgba(255, 255, 255, 0.7);
+
+    /* --- Notificaciones --- */
+    --notify-success: #198754;
+    --notify-danger: #dc3545;
+    --notify-warning: #ffc107;
+    --notify-info: #0dcaf0;
+
+    /* --- Scrollbar --- */
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #0d6efd;
+    --scrollbar-thumb-hover: #0b5ed7;
+}
+
+/* ============================================
+   MODO OSCURO - Sobreescribe las variables
+   ============================================ */
+
+.dark-mode {
+    /* --- General / Body --- */
+    --bg-body: #121212;
+    --text-primary: #e0e0e0;
+    --text-secondary: #adb5bd;
+    --text-muted: #adb5bd;
+    --border-color: #333333;
+
+    /* --- Sidebar / Menú --- */
+    --sidebar-bg-start: #1a1a2e;
+    --sidebar-bg-end: #16213e;
+
+    /* --- Header --- */
+    --header-bg: #1e1e1e;
+    --header-text: #e0e0e0;
+    --header-shadow: rgba(0, 0, 0, 0.3);
+
+    /* --- Cards --- */
+    --card-bg: #1e1e1e;
+    --card-border: #333333;
+    --card-header-bg: #2c2c2c;
+    --card-header-text: #e0e0e0;
+    --card-shadow-hover: rgba(0, 0, 0, 0.4);
+
+    /* --- Botones --- */
+    --btn-primary-bg: #0d6efd;
+    --btn-primary-hover: #0b5ed7;
+    --btn-toggle-border: #444444;
+    --btn-toggle-text: #e0e0e0;
+    --btn-toggle-hover-bg: #2e2e2e;
+    --btn-toggle-hover-border: #555555;
+    --btn-toggle-hover-text: #ffc107;
+
+    /* --- Dropdown --- */
+    --dropdown-bg: #1e1e1e;
+    --dropdown-text: #e0e0e0;
+    --dropdown-hover-bg: #333333;
+    --dropdown-hover-text: #ffffff;
+    --dropdown-border: #333333;
+    --dropdown-shadow: rgba(0, 0, 0, 0.4);
+    --dropdown-divider: #333333;
+
+    /* --- Footer --- */
+    --footer-bg: #0d0d0d;
+    --footer-text: #ffffff;
+    --footer-text-muted: rgba(255, 255, 255, 0.7);
+
+    /* --- Scrollbar --- */
+    --scrollbar-track: #1e1e1e;
+    --scrollbar-thumb: #444444;
+    --scrollbar-thumb-hover: #555555;
+}
+
+/* ============================================
+   ESTILOS BASE
+   ============================================ */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    overflow-x: hidden;
+}
+
+.img-logo-selection {
+    height: 40px;
+}
+
+.big-arrow {
+    font-size: 8rem;
+    color: var(--notify-danger);
+    margin-top: 1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-30px); }
+    60% { transform: translateY(-15px); }
+}
+
+/* ============================================
+   SIDEBAR / MENU LATERAL
+   ============================================ */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
+    color: var(--sidebar-text);
+    z-index: 1000;
+    transition: width var(--transition-speed), transform var(--transition-speed);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform: translateX(-100%);
+}
+
+.sidebar.collapsed {
+    width: 70px;
+    overflow: visible;
+}
+
+.sidebar.collapsed .sidebar-brand span {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-link span,
+.sidebar.collapsed .sidebar-nav .nav-link .nav-link-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-link {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-link i {
+    margin: 0;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-link .fa-chevron-down {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-nav .collapse {
+    display: none !important;
+}
+
+.sidebar.collapsed:hover {
+    width: 280px;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+}
+
+.sidebar.collapsed:hover .sidebar-brand span {
+    opacity: 1;
+    width: auto;
+    margin-left: 0.5rem;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .nav-link span {
+    opacity: 1;
+    width: auto;
+    margin-left: 0.5rem;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .nav-link {
+    justify-content: flex-start;
+    padding: 0.75rem 1.0rem;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .nav-link i {
+    margin-right: 0.5rem;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .nav-link .fa-chevron-down {
+    display: block;
+    margin-left: auto;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .collapse:not(.show) {
+    display: none !important;
+}
+
+.sidebar.collapsed:hover .sidebar-nav .collapse.show {
+    display: block !important;
+}
+
+.sidebar.collapsed:hover .sidebar-header {
+    padding: 1.0rem;
+    justify-content: space-between;
+}
+
+.sidebar-header {
+    padding: 1.0rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--sidebar-header-bg);
+    transition: padding var(--transition-speed);
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-header {
+    padding: 1.0rem 0.75rem;
+    justify-content: center;
+}
+
+.sidebar-brand {
+    color: white;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.sidebar-brand:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-close-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color var(--transition-speed);
+}
+
+.btn-close-sidebar:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.sidebar-nav .nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav .nav-item {
+    margin: 0.25rem 0;
+}
+
+.sidebar-nav .nav-link {
+    color: var(--sidebar-text);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all var(--transition-speed);
+    border-left: 3px solid transparent;
+    position: relative;
+    white-space: nowrap;
+}
+
+.sidebar-nav .nav-link span {
+    transition: opacity var(--transition-speed), width var(--transition-speed), margin var(--transition-speed);
+}
+
+.sidebar-nav .nav-link:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-text-hover);
+    border-left-color: var(--sidebar-text-hover);
+    padding-left: 1.75rem;
+}
+
+.sidebar-nav .nav-link.active {
+    background-color: var(--sidebar-active-bg);
+    color: white;
+    border-left-color: white;
+    font-weight: 600;
+}
+
+.sidebar-nav .nav-link i {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-link i {
+    width: auto;
+    font-size: 1.1rem;
+}
+
+.sidebar-nav .nav-link .fa-chevron-down {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform var(--transition-speed);
+}
+
+.sidebar-nav .nav-link[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav .collapse .nav-link {
+    padding-left: 2.5rem;
+    font-size: 0.9rem;
+}
+
+.sidebar-nav .collapse .nav-link:hover {
+    padding-left: 2.75rem;
+}
+
+.sidebar:not(.collapsed) .sidebar-nav .nav-item:hover > .collapse:not(.show) {
+    display: none !important;
+}
+
+.sidebar:not(.collapsed) .sidebar-nav .nav-link[aria-expanded="true"] + .collapse,
+.sidebar .sidebar-nav .nav-link[aria-expanded="true"] + .collapse {
+    display: block !important;
+}
+
+.sidebar.show {
+    transform: translateX(0);
+}
+
+/* ============================================
+   OVERLAY MOVILES
+   ============================================ */
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed), visibility var(--transition-speed);
+}
+
+.sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============================================
+   HEADER SUPERIOR
+   ============================================ */
+
+.top-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    box-shadow: 0 2px 10px var(--header-shadow);
+    z-index: 999;
+    transition: left var(--transition-speed), background-color var(--transition-speed), color var(--transition-speed);
+    padding: 0 1rem;
+}
+
+.top-header.shifted {
+    left: 280px;
+    transition: left var(--transition-speed);
+}
+
+.top-header.shifted.sidebar-collapsed {
+    left: 70px;
+}
+
+.btn-menu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--header-text);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+}
+
+.btn-menu-toggle:hover {
+    background-color: var(--btn-toggle-hover-bg);
+    color: var(--btn-toggle-hover-text);
+}
+
+.btn-theme-toggle {
+    background: none;
+    border: 1px solid var(--btn-toggle-border);
+    color: var(--btn-toggle-text);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+    font-size: 1.1rem;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-theme-toggle:hover {
+    background-color: var(--btn-toggle-hover-bg);
+    border-color: var(--btn-toggle-hover-border);
+    color: var(--btn-toggle-hover-text);
+}
+
+.btn-theme-toggle i {
+    transition: transform var(--transition-speed);
+}
+
+.btn-profile {
+    background: none;
+    border: 1px solid var(--btn-toggle-border);
+    color: var(--btn-toggle-text);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+}
+
+.btn-profile:hover {
+    background-color: var(--btn-toggle-hover-bg);
+    border-color: var(--btn-toggle-hover-border);
+    color: var(--btn-toggle-hover-text);
+}
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    padding-top: 80px;
+    transition: margin-left var(--transition-speed);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content.shifted {
+    margin-left: 280px;
+}
+
+.main-content.shifted.sidebar-collapsed {
+    margin-left: 70px;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    border-radius: 12px;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+    animation: fadeIn 0.5s ease-in;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--card-shadow-hover) !important;
+}
+
+.card-header.bg-primary {
+    background-color: var(--card-header-bg) !important;
+    color: var(--card-header-text);
+}
+
+.card-body {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn {
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background-color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+}
+
+.btn-primary:hover {
+    background-color: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+}
+
+/* ============================================
+   DROPDOWN
+   ============================================ */
+
+.dropdown-menu {
+    background-color: var(--dropdown-bg);
+    border: 1px solid var(--dropdown-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--dropdown-shadow);
+    margin-top: 8px;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    color: var(--dropdown-text);
+    transition: all var(--transition-speed);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    margin: 2px 0;
+}
+
+.dropdown-item:hover {
+    background-color: var(--dropdown-hover-bg);
+    color: var(--dropdown-hover-text);
+    transform: translateX(3px);
+}
+
+.dropdown-item-logout:hover {
+    background-color: var(--notify-danger) !important;
+    color: white !important;
+}
+
+.dropdown-divider {
+    margin: 0.25rem 0;
+    border-color: var(--dropdown-divider);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.footer {
+    margin-top: auto;
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    transition: background-color var(--transition-speed);
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.footer a {
+    color: var(--footer-text);
+    transition: color var(--transition-speed);
+}
+
+.footer a:hover {
+    color: var(--btn-primary-bg) !important;
+}
+
+.footer .text-muted {
+    color: var(--footer-text-muted) !important;
+}
+
+/* ============================================
+   TEXTO
+   ============================================ */
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+
+.navbar {
+    background-color: var(--btn-primary-bg) !important;
+    transition: background-color var(--transition-speed);
+    backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+    .sidebar-overlay {
+        display: block;
+    }
+}
+
+@media (min-width: 992px) {
+    .btn-close-sidebar {
+        display: none !important;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* ============================================
+   MEJORAS VISUALES
+   ============================================ */
+
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.border-primary, .border-success, .border-warning {
+    border-width: 2px !important;
+}
