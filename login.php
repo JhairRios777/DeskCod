@@ -96,27 +96,6 @@
                     </button>
 
                 </form>
-
-                <!-- Divider -->
-                <div class="divider mt-4">
-                    <span>o continúa con</span>
-                </div>
-
-                <!-- Botones sociales -->
-                <div class="d-flex gap-2 justify-content-center mt-3">
-                    <button type="button" class="btn btn-social btn-google flex-grow-1">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                    <button type="button" class="btn btn-social btn-microsoft flex-grow-1">
-                        <i class="fab fa-microsoft"></i> Microsoft
-                    </button>
-                </div>
-
-                <!-- Footer -->
-                <div class="login-footer text-center mt-4">
-                    <p class="mb-0">¿No tienes cuenta? <a href="#">Regístrate</a></p>
-                </div>
-
             </div>
         </div>
     </div>
