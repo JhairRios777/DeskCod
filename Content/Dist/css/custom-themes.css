@@ -467,10 +467,14 @@ body {
 }
 
 /* ============================================
-   TABLAS — ESTILOS BASE SOLO
-   (hover y modo oscuro van en cada vista con <style>)
+   TABLAS — SOLUCIÓN GLOBAL DEFINITIVA
+   Bootstrap 5 usa variables CSS internas en
+   cada celda con alta especificidad.
+   La única forma de pisarlas globalmente es
+   redefinirlas en el selector correcto.
    ============================================ */
 
+/* Encabezado — ambos temas */
 .table thead th {
     background-color: var(--btn-primary-bg);
     color: #ffffff !important;
@@ -481,13 +485,88 @@ body {
     letter-spacing: 0.05em;
 }
 
+/* Transición suave en filas */
 .table tbody tr {
     transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
+/* Hover tema claro */
 .table-hover tbody tr:hover {
     background: rgba(0, 92, 62, 0.06);
 }
+
+.table-hover > tbody > tr:hover > :not(caption) > * > *,
+.table-hover > tbody > tr:hover > * {
+    background-color: rgba(0, 92, 62, 0.06) !important;
+    color: #212529 !important;
+    --bs-table-bg-state: rgba(0, 92, 62, 0.06) !important;
+}
+
+/* ── MODO OSCURO — FIX GLOBAL ───────────────
+   Se redefinen las variables internas de BS5
+   directamente en el elemento .table para
+   que apliquen a todas las celdas del sistema
+   ─────────────────────────────────────────── */
+body.dark-mode .table {
+    /* Variables internas de Bootstrap 5 */
+    --bs-table-color:        #e0e0e0;
+    --bs-table-bg:           transparent;
+    --bs-table-border-color: #1e3329;
+    --bs-table-hover-color:  #e0e0e0;
+    --bs-table-hover-bg:     rgba(0, 230, 118, 0.07);
+    --bs-table-striped-color:#e0e0e0;
+    --bs-table-striped-bg:   rgba(0, 230, 118, 0.03);
+    --bs-table-active-color: #e0e0e0;
+    --bs-table-active-bg:    rgba(0, 230, 118, 0.1);
+    color: #e0e0e0 !important;
+}
+
+/* Todas las celdas en modo oscuro */
+body.dark-mode .table > :not(caption) > * > * {
+    color: #e0e0e0 !important;
+    background-color: transparent !important;
+    border-bottom-color: #1e3329 !important;
+    --bs-table-bg-state: transparent !important;
+    --bs-table-bg-type:  transparent !important;
+}
+
+/* Encabezado en modo oscuro */
+body.dark-mode .table thead > tr > * {
+    color: #ffffff !important;
+    background-color: #1a3329 !important;
+    border-color: #1e3329 !important;
+}
+
+/* Texto dentro de celdas */
+body.dark-mode .table p,
+body.dark-mode .table p.mb-0,
+body.dark-mode .table span:not([class*="badge"]),
+body.dark-mode .table .fw-semibold,
+body.dark-mode .table .fw-bold { color: #ffffff !important; }
+
+body.dark-mode .table small,
+body.dark-mode .table .text-muted { color: #adb5bd !important; }
+
+/* Hover modo oscuro */
+body.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
+body.dark-mode .table-hover > tbody > tr:hover > * {
+    background-color: rgba(0, 230, 118, 0.09) !important;
+    color: #e0e0e0 !important;
+    --bs-table-bg-state: rgba(0, 230, 118, 0.09) !important;
+}
+
+body.dark-mode .table-hover > tbody > tr:hover small,
+body.dark-mode .table-hover > tbody > tr:hover .text-muted { color: #adb5bd !important; }
+
+/* Card footer en modo oscuro */
+body.dark-mode .card-footer {
+    background: #111f18 !important;
+    border-color: #1e3329 !important;
+    color: #adb5bd !important;
+}
+
+/* Progress en modo oscuro */
+body.dark-mode .progress { background: #1e3329; }
 
 /* ============================================
    ANIMACIONES

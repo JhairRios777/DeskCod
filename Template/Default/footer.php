@@ -4,7 +4,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="Content/Dist/js/sidebar.js"></script>
-    <script src="Content/Dist/js/theme-switcher.js"></script>
+    <script src="/Content/Dist/js/sidebar.js"></script>
+    <script src="/Content/Dist/js/theme-switcher.js"></script>
 </body>
 </html>
