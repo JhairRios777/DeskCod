@@ -8,12 +8,20 @@ namespace Config;
 
 class JRouter {
 
-    public static function run(JRequest $request) {
+    // ============================================
+    // Mapa de vistas personalizadas
+    // Permite cargar vistas desde subcarpetas
+    // cuando la convención estándar no aplica
+    // Formato: 'Controller/Metodo' => 'Ruta/Relativa/Vista.php'
+    // ============================================
+    private static array $viewMap = [
+        'Empleados/Roles'         => 'Empleados/Roles/index.php',
+        'Empleados/RolesRegistry' => 'Empleados/Roles/Registry.php',
+    ];
 
-        // ── SANITIZACIÓN CRÍTICA ──────────────────
-        // Solo permite letras y números en el nombre del controller
-        // Esto previene Path Traversal:
-        // ej: /../Config/Conexion → queda vacío → 404
+    public static function run(JRequest $request): void {
+
+        // ── Sanitización del controller ──────────
         $controllerName = preg_replace('/[^a-zA-Z0-9]/', '', $request->getController());
 
         if (empty($controllerName)) {
@@ -25,59 +33,58 @@ class JRouter {
         $method          = $request->getMethod();
         $argument        = $request->getArgument();
 
-        // ── SANITIZACIÓN DEL MÉTODO ──────────────
-        // Solo permite letras, números y guiones para el método
+        // ── Sanitización del método ──────────────
         $method = preg_replace('/[^a-zA-Z0-9_-]/', '', $method);
         if (empty($method)) {
             $method = "index";
         }
 
-        // Construye la ruta absoluta al archivo del controller
         $path = ROOT . "Controllers" . DS . $controllerName . ".php";
 
-        if (is_readable($path)) {
-            require $path;
-
-            // Instancia el controller con su namespace completo
-            $className  = "Controllers\\" . $controllerName;
-            $controller = new $className();
-
-            // Verifica que el método exista antes de llamarlo
-            // Previene llamar métodos privados o inexistentes
-            if (!method_exists($controller, $method)) {
-                self::error404();
-                return;
-            }
-
-            // Llama al método con o sin argumentos
-            // call_user_func_array pasa el array de argumentos como parámetros individuales
-            if ($argument && $argument !== [""]) {
-                $JData = call_user_func_array([$controller, $method], $argument);
-            } else {
-                $JData = call_user_func([$controller, $method]);
-            }
-
-            // Extrae el array retornado por el controller
-            // como variables disponibles en la vista
-            // ej: return ['clientes' => [...]] → $clientes en la vista
-            if (is_array($JData)) {
-                extract($JData);
-            }
-
-        } else {
+        if (!is_readable($path)) {
             self::error404();
             return;
         }
 
-        // Carga la vista correspondiente al controller y método
-        $viewPath = ROOT . "Views" . DS . $request->getController() . DS . $method . ".php";
+        require $path;
+
+        $className  = "Controllers\\" . $controllerName;
+        $controller = new $className();
+
+        if (!method_exists($controller, $method)) {
+            self::error404();
+            return;
+        }
+
+        // Llama al método con o sin argumentos
+        if ($argument && $argument !== [""]) {
+            $JData = call_user_func_array([$controller, $method], $argument);
+        } else {
+            $JData = call_user_func([$controller, $method]);
+        }
+
+        // Extrae variables para la vista
+        if (is_array($JData)) {
+            extract($JData);
+        }
+
+        // ============================================
+        // Resuelve la ruta de la vista
+        // 1. Busca en el mapa de rutas personalizadas
+        // 2. Si no existe usa la convención estándar:
+        //    Views/Controller/method.php
+        // ============================================
+        $mapKey = $request->getController() . '/' . $method;
+
+        $viewPath = isset(self::$viewMap[$mapKey])
+            ? ROOT . "Views" . DS . str_replace('/', DS, self::$viewMap[$mapKey])
+            : ROOT . "Views" . DS . $request->getController() . DS . $method . ".php";
 
         if (is_readable($viewPath)) {
             require $viewPath;
         }
     }
 
-    // Muestra página 404 con código HTTP correcto
     private static function error404(): void {
         http_response_code(404);
         $errorView = ROOT . "Views" . DS . "errors" . DS . "404.php";

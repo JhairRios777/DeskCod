@@ -152,7 +152,7 @@ body.dark-mode .info-row .label { color: #adb5bd; }
 
             <?php if ($cliente): ?>
             <!-- ── PANEL DE INFO SUSCRIPCIÓN AL EDITAR ── -->
-            <div class="card shadow-sm mt-4">
+            <div class="card shadow-sm mt-3">
                 <div class="card-header bg-primary d-flex align-items-center justify-content-between">
                     <span><i class="fas fa-sync-alt me-2"></i>Suscripción Actual</span>
                     <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>"
@@ -173,14 +173,14 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                     $claseD = $dias > 7 ? 'text-success' : ($dias > 0 ? 'text-warning' : 'text-danger');
                     ?>
                     <div class="row g-3 align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="p-3 rounded" style="background:<?= $bgActual ?>;border:2px solid <?= $borderActual ?>;">
                                 <p class="text-muted small mb-1">Plan activo</p>
                                 <h5 class="fw-bold mb-1"><?= htmlspecialchars($cliente['plan_nombre']) ?></h5>
                                 <span class="badge bg-success">$<?= number_format($cliente['plan_precio'],2) ?>/mes</span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-2">
                             <div class="d-flex flex-column gap-2">
                                 <?php
                                 $est = $cliente['suscripcion_estado'] ?? '';

@@ -150,7 +150,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-2 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <label class="form-label fw-semibold mb-1">Buscar</label>
                 <div class="input-group">
                     <span class="input-group-text" style="background:#005C3E;color:#fff;border-color:#005C3E;">
@@ -170,7 +170,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <option value="suspendida">Suspendida</option>
                 </select>
             </div>
-            <div name="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label fw-semibold mb-1">Plan</label>
                 <select class="form-select" id="filtroPlan">
                     <option value="">Todos</option>
@@ -179,7 +179,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <option value="plan-premium">Premium</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 d-flex justify-content-end">
                 <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
                     <i class="fas fa-times me-1"></i>Limpiar
                 </button>

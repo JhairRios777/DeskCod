@@ -1,6 +1,26 @@
+<?php
+// ============================================
+// Helper — verifica si el empleado tiene permiso
+// Uso: puedeVer('clientes'), puedeCriar('tickets')
+// ============================================
+function puedeVer(string $modulo): bool {
+    return !empty($_SESSION['system']['Permisos'][$modulo]['ver']);
+}
+
+function puedeCriar(string $modulo): bool {
+    return !empty($_SESSION['system']['Permisos'][$modulo]['crear']);
+}
+
+function esAdmin(): bool {
+    return !empty($_SESSION['system']['EsAdmin']);
+}
+?>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <a href="/index.php" class="sidebar-brand d-flex align-items-center">
+        <a href="/Home" class="sidebar-brand d-flex align-items-center">
             <img src="/Content/Demo/logos/LOGO_PRINCIPAL_perfil.png" class="me-2" style="height:32px;">
             <span>DeskCod</span>
         </a>
@@ -12,23 +32,25 @@
     <nav class="sidebar-nav">
         <ul class="nav flex-column">
 
-            <!-- Dashboard -->
+            <?php if (puedeVer('dashboard')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="/Home">
                     <i class="fas fa-chart-pie"></i>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
             </li>
+            <?php endif; ?>
 
-            <!-- Clientes -->
+            <?php if (puedeVer('clientes')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="/Clientes">
                     <i class="fas fa-users"></i>
                     <span class="nav-link-text">Clientes</span>
                 </a>
             </li>
+            <?php endif; ?>
 
-            <!-- Suscripciones (con submenú) -->
+            <?php if (puedeVer('suscripciones')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="#submenuSuscripciones"
                    data-bs-toggle="collapse"
@@ -46,23 +68,20 @@
                                 <span class="nav-link-text">Ver todas</span>
                             </a>
                         </li>
+                        <?php if (puedeCriar('suscripciones')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Suscripciones/nueva">
+                            <a class="nav-link" href="/Suscripciones/Registry">
                                 <i class="fas fa-plus-circle"></i>
                                 <span class="nav-link-text">Nueva suscripción</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Suscripciones/por-vencer">
-                                <i class="fas fa-clock"></i>
-                                <span class="nav-link-text">Por vencer</span>
-                            </a>
-                        </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
 
-            <!-- Tickets (con submenú) -->
+            <?php if (puedeVer('tickets')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="#submenuTickets"
                    data-bs-toggle="collapse"
@@ -80,37 +99,29 @@
                                 <span class="nav-link-text">Ver todos</span>
                             </a>
                         </li>
+                        <?php if (puedeCriar('tickets')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Tickets/abiertos">
-                                <i class="fas fa-folder-open"></i>
-                                <span class="nav-link-text">Abiertos</span>
+                            <a class="nav-link" href="/Tickets/Registry">
+                                <i class="fas fa-plus-circle"></i>
+                                <span class="nav-link-text">Nuevo ticket</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Tickets/en-proceso">
-                                <i class="fas fa-spinner"></i>
-                                <span class="nav-link-text">En proceso</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Tickets/resueltos">
-                                <i class="fas fa-check-circle"></i>
-                                <span class="nav-link-text">Resueltos</span>
-                            </a>
-                        </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
 
-            <!-- Empleados -->
+            <?php if (puedeVer('empleados')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="/Empleados">
                     <i class="fas fa-user-tie"></i>
                     <span class="nav-link-text">Empleados</span>
                 </a>
             </li>
+            <?php endif; ?>
 
-            <!-- Planes (con submenú) -->
+            <?php if (puedeVer('planes')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="#submenuPlanes"
                    data-bs-toggle="collapse"
@@ -128,31 +139,36 @@
                                 <span class="nav-link-text">Ver planes</span>
                             </a>
                         </li>
+                        <?php if (puedeCriar('planes')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Planes/nuevo">
+                            <a class="nav-link" href="/Planes/Registry">
                                 <i class="fas fa-plus-circle"></i>
                                 <span class="nav-link-text">Nuevo plan</span>
                             </a>
                         </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </li>
+            <?php endif; ?>
 
-            <!-- Pagos y Facturación -->
+            <?php if (puedeVer('pagos')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="/Pagos">
                     <i class="fas fa-credit-card"></i>
                     <span class="nav-link-text">Pagos y Facturación</span>
                 </a>
             </li>
+            <?php endif; ?>
 
-            <!-- Reportes -->
+            <?php if (puedeVer('reportes')): ?>
             <li class="nav-item">
                 <a class="nav-link" href="/Reportes">
                     <i class="fas fa-chart-bar"></i>
                     <span class="nav-link-text">Reportes</span>
                 </a>
             </li>
+            <?php endif; ?>
 
         </ul>
     </nav>
@@ -176,18 +192,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li>
-                    <a class="dropdown-item" href="/Empleados/perfil">
-                        <i class="fas fa-user me-2"></i>Mi perfil
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="/Empleados/configuracion">
-                        <i class="fas fa-cog me-2"></i>Configuración
-                    </a>
-                </li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item dropdown-item-logout" href="/Auth/logout">
+                    <a class="dropdown-item" href="/Auth/logout">
                         <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
                     </a>
                 </li>
