@@ -11,110 +11,121 @@ class AuthController {
         $this->model = new AuthModel();
     }
 
-    public function login(): void {
+    // ============================================
+    // GET  /Auth/login  → vista
+    // POST /Auth/login  → procesar
+    // ============================================
+    public function login(): array {
+        // Limpia cualquier output previo antes de responder JSON
+        while (ob_get_level() > 0) ob_end_clean();
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->responder(false, 'Método no permitido.');
-            return;
+        if (isset($_SESSION['system']['UserName'])) {
+            header('Location: /Home');
+            exit();
         }
 
-        $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
+        $error = null;
 
-        if (empty($username) || empty($password)) {
-            $this->responder(false, 'Usuario y contraseña son obligatorios.');
-            return;
-        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            header('Content-Type: application/json');
 
-        if (strlen($username) > 80 || strlen($password) > 100) {
-            $this->responder(false, 'Datos inválidos.');
-            return;
-        }
+            $username = trim(strtolower($_POST['username'] ?? ''));
+            $password = $_POST['password'] ?? '';
 
-        $empleado = $this->model->buscarPorUsername($username);
+            if (empty($username) || empty($password)) {
+                echo json_encode(['success' => false, 'message' => 'Ingresa tu usuario y contraseña.']);
+                exit();
+            }
 
+            try {
+                $empleado = $this->model->buscarPorUsername($username);
 
-        // CORRECCIÓN: cast a int para manejar "1" string vs 1 entero
-        if (
-            !$empleado ||
-            (int)$empleado['activo'] !== 1 ||
-            !password_verify($password, $empleado['hash'])
-        ) {
-            $this->responder(false, 'Usuario o contraseña incorrectos.');
-            return;
-        }
+                if (!$empleado) {
+                    echo json_encode(['success' => false, 'message' => 'Usuario o contraseña incorrectos.']);
+                    exit();
+                }
 
-        session_regenerate_id(true);
+                if (!$empleado['activo']) {
+                    echo json_encode(['success' => false, 'message' => 'Tu cuenta está desactivada. Contacta al administrador.']);
+                    exit();
+                }
 
-        if ($empleado['es_admin']) {
-            $permisos = $this->todosLosPermisos();
-        } else {
-            $permisos = $this->model->obtenerPermisos($empleado['rol_id']);
-        }
+                if (!empty($empleado['bloqueado_hasta']) && strtotime($empleado['bloqueado_hasta']) > time()) {
+                    $restantes = ceil((strtotime($empleado['bloqueado_hasta']) - time()) / 60);
+                    echo json_encode(['success' => false, 'message' => "Cuenta bloqueada. Intenta en {$restantes} minuto(s)."]);
+                    exit();
+                }
 
-        $_SESSION['system'] = [
-            'UserID'   => $empleado['id'],
-            'UserName' => $empleado['nombre'],
-            'Email'    => $empleado['email'],
-            'RolID'    => $empleado['rol_id'],
-            'EsAdmin'  => $empleado['es_admin'],
-            'Permisos' => $permisos,
-        ];
+                if (!password_verify($password, $empleado['hash'])) {
+                    $this->model->incrementarIntento($username);
+                    $empleadoAct = $this->model->buscarPorUsername($username);
+                    $intentos    = (int)($empleadoAct['intentos_fallidos'] ?? 0);
+                    $restantes   = 5 - $intentos;
 
-        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        $this->model->registrarLogin($empleado['id'], $ip);
+                    if ($intentos >= 5) {
+                        echo json_encode(['success' => false, 'message' => 'Cuenta bloqueada por 15 minutos.']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => "Contraseña incorrecta. Te quedan {$restantes} intento(s)."]);
+                    }
+                    exit();
+                }
 
-        $this->responder(true, 'Acceso correcto.', ['redirect' => '/Home']);
-    }
+                // ── Login exitoso ──
+                $this->model->resetIntentos($username);
+                $this->model->actualizarLogin($empleado['id']);
 
-    public function logout(): void {
+                session_regenerate_id(true);
 
-        if (isset($_SESSION['system']['UserID'])) {
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-            $this->model->registrarLogout(
-                $_SESSION['system']['UserID'],
-                $ip
-            );
-        }
+                $permisos    = $this->model->obtenerPermisos($empleado['rol_id']);
+                $permisosMap = [];
+                foreach ($permisos as $p) {
+                    $permisosMap[$p['modulo']][$p['accion']] = 1;
+                }
 
-        $_SESSION = [];
+                $_SESSION['system'] = [
+                    'UserID'   => $empleado['id'],
+                    'UserName' => $empleado['nombre'],
+                    'Email'    => $empleado['email'],
+                    'RolID'    => $empleado['rol_id'],
+                    'EsAdmin'  => $empleado['es_admin'],
+                    'Foto'     => $empleado['foto'] ?? null,
+                    'Permisos' => $permisosMap,
+                ];
 
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(), '', time() - 42000,
-                $params["path"],   $params["domain"],
-                $params["secure"], $params["httponly"]
-            );
-        }
+                $this->auditar('LOGIN_OK', $empleado['id']);
 
-        session_destroy();
+                echo json_encode(['success' => true, 'redirect' => '/Home']);
+                exit();
 
-        header('Location: /Login');
-        exit();
-    }
-
-    private function todosLosPermisos(): array {
-        $modulos  = ['dashboard','clientes','suscripciones','tickets',
-                     'empleados','planes','pagos','reportes'];
-        $acciones = ['ver','crear','editar','eliminar','exportar'];
-
-        $permisos = [];
-        foreach ($modulos as $mod) {
-            foreach ($acciones as $acc) {
-                $permisos[$mod][$acc] = true;
+            } catch (\Throwable $e) {
+                error_log("[DeskCod] Login error: " . $e->getMessage());
+                echo json_encode(['success' => false, 'message' => 'Error interno. Intenta de nuevo.']);
+                exit();
             }
         }
-        return $permisos;
+
+        return compact('error');
     }
 
-    private function responder(bool $success, string $message, array $extra = []): void {
-        header('Content-Type: application/json');
-        echo json_encode(array_merge(
-            ['success' => $success, 'message' => $message],
-            $extra
-        ));
+    // ============================================
+    // POST /Auth/logout
+    // ============================================
+    public function logout(): void {
+        $userId = $_SESSION['system']['UserID'] ?? null;
+        if ($userId) $this->auditar('LOGOUT', $userId);
+        session_destroy();
+        header('Location: /Auth/login');
         exit();
+    }
+
+    private function auditar(string $accion, int $userId): void {
+        try {
+            $db = (new \Config\Conexion())->getConexion();
+            $db->prepare("INSERT INTO auditoria_acciones (empleado_id,accion,tabla,registro_id,ip) VALUES (?,?,?,?,?)")
+               ->execute([$userId, $accion, 'empleados', $userId, $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0']);
+        } catch (\Throwable $e) {
+            error_log("[DeskCod] Auditoría: " . $e->getMessage());
+        }
     }
 }
 ?>

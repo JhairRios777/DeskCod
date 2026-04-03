@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Evita session_start() duplicado
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once "Define.php";
 require_once "Config" . DIRECTORY_SEPARATOR . "JRequest.php";
@@ -20,7 +23,6 @@ if (!in_array($controllerActual, $rutasPublicas)) {
     }
 }
 
-// Métodos que siempre responden JSON o no necesitan template
 $metodosJson = [
     'suscripciones', 'cuentas',
     'suspender', 'reactivar', 'cambiarPlan',
@@ -31,7 +33,8 @@ $esRutaPublica = in_array($controllerActual, $rutasPublicas);
 $esPost        = $_SERVER['REQUEST_METHOD'] === 'POST';
 $esMetodoJson  = in_array($methodActual, $metodosJson);
 
-if (!$esRutaPublica && ($esPost || $esMetodoJson)) {
+// Todo POST y métodos JSON van sin template
+if ($esPost || $esMetodoJson) {
     Config\JRouter::run($request);
     exit();
 }

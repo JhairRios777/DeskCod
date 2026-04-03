@@ -2,11 +2,9 @@
 # .htaccess — DeskCod
 # ============================================
 
-# Desactiva el listado de directorios
 Options All -Indexes
 Options +FollowSymLinks
 
-# Bloquea acceso directo a archivos sensibles
 <FilesMatch "^\.env|error\.log">
     Order Allow,Deny
     Deny from all
@@ -15,25 +13,19 @@ Options +FollowSymLinks
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # ── Archivos y carpetas reales no se redirigen ──
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^Login$ login.php [QSA,L]
 
-    # Ruta del login — va a login.php directamente
-    RewriteRule ^(Login)$ login.php [QSA,L]
-
-    # Ruta de la API — va a APIR/index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(API)$ APIR/index.php [QSA,L]
+    RewriteRule ^API(.*)$ APIR/index.php [QSA,L]
 
-    # Todas las demás rutas van al index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
 </IfModule>
 
-# ── Headers de seguridad HTTP ──────────────
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"

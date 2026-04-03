@@ -3,24 +3,17 @@ namespace Controllers;
 
 use Models\ClientesModel;
 
-// ============================================
-// ClientesController.php
-// Responsabilidad única: gestión de clientes
-// Las suscripciones se gestionan en
-// SuscripcionesController
-// ============================================
-
 class ClientesController {
 
     private $model;
+    private const UPLOAD_DIR_LOGOS = 'Content/Uploads/logos/';
+    private const MAX_SIZE         = 3 * 1024 * 1024;
+    private const TIPOS            = ['image/jpeg', 'image/jpg', 'image/png'];
 
     public function __construct() {
         $this->model = new ClientesModel();
     }
 
-    // ============================================
-    // GET /Clientes — lista de clientes
-    // ============================================
     public function index(): array {
         $clientes      = $this->model->obtenerTodos();
         $flash_success = $_SESSION['flash_success'] ?? null;
@@ -29,21 +22,12 @@ class ClientesController {
         return compact('clientes', 'flash_success', 'flash_error');
     }
 
-    // ============================================
-    // GET  /Clientes/Registry     → formulario vacío
-    // GET  /Clientes/Registry/1   → formulario editar
-    // POST /Clientes/Registry     → guardar nuevo
-    // POST /Clientes/Registry/1   → guardar cambios
-    // ============================================
     public function Registry(int $id = 0): array {
 
         $cliente = null;
         $error   = null;
         $success = null;
-
-        // Al crear se puede asignar plan inicial
-        // Al editar solo se modifican datos del cliente
-        $planes = $id === 0 ? $this->model->obtenerPlanes() : [];
+        $planes  = $id === 0 ? $this->model->obtenerPlanes() : [];
 
         if ($id > 0) {
             $cliente = $this->model->obtenerPorId($id);
@@ -60,24 +44,31 @@ class ClientesController {
 
             if (!empty($errores)) {
                 $_SESSION['flash_error'] = implode(' ', $errores);
-                $url = $id > 0 ? "/Clientes/Registry/{$id}" : '/Clientes/Registry';
-                header("Location: {$url}");
+                header("Location: " . ($id > 0 ? "/Clientes/Registry/{$id}" : '/Clientes/Registry'));
                 exit();
             }
 
             try {
                 if ($id > 0) {
-                    // Editar — solo datos del cliente
-                    // Las suscripciones se gestionan en /Suscripciones
                     $this->model->actualizar($id, $datos);
+
+                    // Procesa logo si se subió uno nuevo
+                    if (!empty($_FILES['logo']['name'])) {
+                        $this->procesarYGuardarLogo($id, $cliente['logo'] ?? null);
+                    }
+
                     $this->auditar('CLIENTE_ACTUALIZADO', $id);
 
                 } else {
-                    // Crear — con plan inicial opcional
                     $nuevoId = $this->model->crear($datos);
 
                     if (!empty($_POST['plan_id']) && !empty($_POST['fecha_inicio'])) {
                         $this->crearSuscripcionInicial($nuevoId);
+                    }
+
+                    // Procesa logo del cliente nuevo
+                    if (!empty($_FILES['logo']['name'])) {
+                        $this->procesarYGuardarLogo($nuevoId, null);
                     }
 
                     $this->auditar('CLIENTE_CREADO', $nuevoId);
@@ -95,13 +86,11 @@ class ClientesController {
                     : 'Error al guardar. Intenta de nuevo.';
                 error_log("[DeskCod] Registry cliente: " . $e->getMessage());
                 $_SESSION['flash_error'] = $msg;
-                $url = $id > 0 ? "/Clientes/Registry/{$id}" : '/Clientes/Registry';
-                header("Location: {$url}");
+                header("Location: " . ($id > 0 ? "/Clientes/Registry/{$id}" : '/Clientes/Registry'));
                 exit();
             }
         }
 
-        // GET — recupera mensajes flash
         $error   = $_SESSION['flash_error']   ?? null;
         $success = $_SESSION['flash_success'] ?? null;
         unset($_SESSION['flash_error'], $_SESSION['flash_success']);
@@ -109,9 +98,6 @@ class ClientesController {
         return compact('cliente', 'planes', 'error', 'success');
     }
 
-    // ============================================
-    // POST /Clientes/desactivar — soft delete JSON
-    // ============================================
     public function desactivar(): void {
         while (ob_get_level() > 0) ob_end_clean();
         header('Content-Type: application/json');
@@ -140,7 +126,52 @@ class ClientesController {
 
     // ── Helpers privados ──────────────────────
 
-    // Crea la suscripción inicial al registrar un cliente nuevo
+    // ============================================
+    // procesarYGuardarLogo()
+    // Valida la imagen, guarda en disco
+    // y actualiza la BD con la ruta
+    // ============================================
+    private function procesarYGuardarLogo(int $clienteId, ?string $logoActual): void {
+        $file = $_FILES['logo'];
+
+        if ($file['error'] !== UPLOAD_ERR_OK) return;
+
+        if ($file['size'] > self::MAX_SIZE) {
+            $_SESSION['flash_error'] = 'El logo no puede superar 3MB.';
+            return;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime  = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($mime, self::TIPOS)) {
+            $_SESSION['flash_error'] = 'El logo debe ser JPG o PNG.';
+            return;
+        }
+
+        $ext    = $mime === 'image/png' ? 'png' : 'jpg';
+        $nombre = 'logo_' . $clienteId . '_' . uniqid() . '.' . $ext;
+        $dirAbs = ROOT . self::UPLOAD_DIR_LOGOS;
+
+        if (!is_dir($dirAbs)) mkdir($dirAbs, 0755, true);
+
+        if (!move_uploaded_file($file['tmp_name'], $dirAbs . $nombre)) {
+            $_SESSION['flash_error'] = 'No se pudo guardar el logo.';
+            return;
+        }
+
+        // Elimina logo anterior si existe
+        if ($logoActual && file_exists(ROOT . $logoActual)) {
+            unlink(ROOT . $logoActual);
+        }
+
+        $ruta = self::UPLOAD_DIR_LOGOS . $nombre;
+        $db   = (new \Config\Conexion())->getConexion();
+        $db->prepare("UPDATE clientes SET logo = ? WHERE id = ?")
+           ->execute([$ruta, $clienteId]);
+    }
+
     private function crearSuscripcionInicial(int $clienteId): void {
         $db   = (new \Config\Conexion())->getConexion();
         $stmt = $db->prepare("CALL sp_suscripciones_crear(?,?,?,?,?)");
@@ -179,9 +210,7 @@ class ClientesController {
             $db->prepare("INSERT INTO auditoria_acciones (empleado_id,accion,tabla,registro_id,ip) VALUES (?,?,?,?,?)")
                ->execute([
                    $_SESSION['system']['UserID'] ?? 1,
-                   $accion,
-                   'clientes',
-                   $registroId,
+                   $accion, 'clientes', $registroId,
                    $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'
                ]);
         } catch (\PDOException $e) {
