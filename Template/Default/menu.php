@@ -192,10 +192,16 @@ function esAdmin(): bool {
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li>
+                    <a class="dropdown-item" href="/Perfil">
+                        <i class="fas fa-user me-2"></i>Mi perfil
+                    </a>
+                </li>
+                <li>
                     <a class="dropdown-item" href="/Auth/logout">
                         <i class="fas fa-sign-out-alt me-2"></i>Cerrar sesión
                     </a>
                 </li>
+                
             </ul>
         </div>
     </div>

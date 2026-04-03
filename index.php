@@ -20,9 +20,10 @@ if (!in_array($controllerActual, $rutasPublicas)) {
     }
 }
 
-// Métodos que siempre responden JSON — sin template
+// Métodos que siempre responden JSON o no necesitan template
 $metodosJson = [
-    'suscripciones', 'suspender', 'reactivar', 'cambiarPlan',
+    'suscripciones', 'cuentas',
+    'suspender', 'reactivar', 'cambiarPlan',
     'desactivar', 'cambiarEstado', 'asignar', 'comentar',
 ];
 

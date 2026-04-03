@@ -7,6 +7,8 @@ class JRouter {
         'Empleados/Roles'         => 'Empleados/Roles/index.php',
         'Empleados/RolesRegistry' => 'Empleados/Roles/Registry.php',
         'Tickets/ver'             => 'Tickets/ver.php',
+        'Pagos/Cuenta'            => 'Pagos/Cuenta.php',
+        'Perfil/index'            => 'Perfil/index.php',
     ];
 
     public static function run(JRequest $request): void {
