@@ -72,7 +72,7 @@ class EmpleadosModel {
     }
 
     public function obtenerRoles(): array {
-        $stmt = $this->db->query("SELECT id, nombre, descripcion, es_admin FROM roles WHERE activo = 1 ORDER BY id ASC");
+        $stmt = $this->db->query("SELECT id, nombre, descripcion, es_admin FROM roles ORDER BY id ASC");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
@@ -119,7 +119,7 @@ class EmpleadosModel {
     // ── Permisos ──────────────────────────────
 
     public function obtenerPermisosPorRol(int $rolId): array {
-        $stmt = $this->db->prepare("CALL sp_rol_permisos_obtener(?)");
+        $stmt = $this->db->prepare("CALL sp_permisos_por_rol(?)");
         $stmt->execute([$rolId]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
@@ -127,18 +127,18 @@ class EmpleadosModel {
     }
 
     public function guardarPermiso(int $rolId, int $moduloId, int $accionId, int $permitido): void {
-        $stmt = $this->db->prepare("CALL sp_rol_permisos_guardar(?,?,?,?)");
+        $stmt = $this->db->prepare("CALL sp_permisos_guardar(?,?,?,?)");
         $stmt->execute([$rolId, $moduloId, $accionId, $permitido]);
         $stmt->closeCursor();
     }
 
     public function obtenerModulos(): array {
-        $stmt = $this->db->query("SELECT id, nombre, label, icono FROM modulos WHERE activo = 1 ORDER BY orden ASC");
+        $stmt = $this->db->query("SELECT id, nombre FROM modulos ORDER BY id ASC");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function obtenerAcciones(): array {
-        $stmt = $this->db->query("SELECT id, nombre, label FROM acciones ORDER BY id ASC");
+        $stmt = $this->db->query("SELECT id, nombre FROM acciones ORDER BY id ASC");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

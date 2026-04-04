@@ -34,6 +34,21 @@
                     <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
                 </div>
 
+                <!-- Mensajes de estado -->
+                <?php if (isset($_GET['timeout'])): ?>
+                <div class="alert alert-warning d-flex align-items-center gap-2 mt-3 mb-0"
+                     style="border-radius:10px; font-size:.875rem;">
+                    <i class="fas fa-clock"></i>
+                    <span>Tu sesión expiró por inactividad. Inicia sesión de nuevo.</span>
+                </div>
+                <?php elseif (isset($_GET['logout'])): ?>
+                <div class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-0"
+                     style="border-radius:10px; font-size:.875rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Sesión cerrada correctamente.</span>
+                </div>
+                <?php endif; ?>
+
                 <!-- Formulario -->
                 <form id="loginForm" class="mt-4">
 

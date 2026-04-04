@@ -25,33 +25,32 @@ body.dark-mode .form-label { color:#c8e6d5; }
 body.dark-mode .plan-card.plan-basico   { background:rgba(108,117,125,0.15); }
 body.dark-mode .plan-card.plan-estandar { background:rgba(13,110,253,0.15); }
 body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
-body.dark-mode .plan-card.selected.plan-basico   { background:rgba(108,117,125,0.3); }
-body.dark-mode .plan-card.selected.plan-estandar { background:rgba(13,110,253,0.3); }
-body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.25); }
 
 /* Logo upload */
-.logo-wrap {
-    position: relative; display: inline-block;
-}
+.logo-wrap { position:relative; display:inline-block; }
 .logo-preview-circle {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: linear-gradient(135deg,#005C3E,#00E676);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1.5rem;
-    overflow: hidden; border: 3px solid var(--accent);
-    cursor: pointer;
+    width:80px; height:80px; border-radius:50%;
+    background:linear-gradient(135deg,#005C3E,#00E676);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:1.5rem;
+    overflow:hidden; border:3px solid var(--accent); cursor:pointer;
 }
 .logo-preview-circle img { width:100%; height:100%; object-fit:cover; }
 .logo-edit-btn {
-    position: absolute; bottom: 0; right: 0;
-    width: 26px; height: 26px; border-radius: 50%;
-    background: #005C3E; color: #fff; border: 2px solid #fff;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 0.65rem;
+    position:absolute; bottom:0; right:0;
+    width:26px; height:26px; border-radius:50%;
+    background:#005C3E; color:#fff; border:2px solid #fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:0.65rem;
 }
-.logo-edit-btn:hover { background: #00895a; }
+.logo-edit-btn:hover { background:#00895a; }
+
+/* Token API */
+.token-field { font-family: 'Courier New', monospace; font-size:.8rem; letter-spacing:.03em; }
+.bg-accent { background-color:#00E676 !important; }
 </style>
 
+<!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h4 class="fw-bold mb-0">
@@ -78,7 +77,6 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
 </div>
 <?php endif; ?>
 
-<!-- Form con enctype para logo -->
 <form id="clienteForm" action="" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="Registrar" value="1">
     <input type="hidden" name="id" value="<?= $cliente['id'] ?? '' ?>">
@@ -94,13 +92,13 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                 <div class="card-body">
                     <div class="row g-3">
 
-                        <!-- Logo del cliente -->
+                        <!-- Logo -->
                         <div class="col-12">
                             <label class="form-label fw-semibold">Logo de la empresa</label>
                             <div class="d-flex align-items-center gap-3">
                                 <?php
-                                $p   = explode(' ', $cliente['nombre'] ?? 'C');
-                                $ini = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
+                                $p         = explode(' ', $cliente['nombre'] ?? 'C');
+                                $ini       = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
                                 $tienelogo = !empty($cliente['logo']) && file_exists(ROOT . ($cliente['logo'] ?? ''));
                                 ?>
                                 <div class="logo-wrap">
@@ -120,8 +118,7 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                                     <p class="mb-1 small fw-semibold">Haz clic en el círculo para subir un logo</p>
                                     <small class="text-muted">JPG, PNG — máx. 3MB — Opcional</small>
                                     <?php if ($tienelogo): ?>
-                                    <br>
-                                    <small class="text-success"><i class="fas fa-check me-1"></i>Logo cargado</small>
+                                    <br><small class="text-success"><i class="fas fa-check me-1"></i>Logo cargado</small>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -199,26 +196,25 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                 </div>
             </div>
 
+            <!-- Suscripción actual (solo al editar) -->
             <?php if ($cliente): ?>
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-primary d-flex align-items-center justify-content-between">
                     <span><i class="fas fa-sync-alt me-2"></i>Suscripción Actual</span>
                     <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>" class="btn btn-accent btn-sm">
-                        <i class="fas fa-external-link-alt me-1"></i>Gestionar suscripción
+                        <i class="fas fa-external-link-alt me-1"></i>Gestionar
                     </a>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($cliente['plan_nombre'])): ?>
                     <?php
                     $planActual   = strtolower($cliente['plan_nombre']);
-                    $dias   = (int)((strtotime($cliente['fecha_vencimiento']) - time()) / 86400);
-                    $claseD = $dias > 7 ? 'text-success' : ($dias > 0 ? 'text-warning' : 'text-danger');
+                    $dias         = (int)((strtotime($cliente['fecha_vencimiento']) - time()) / 86400);
+                    $claseD       = $dias > 7 ? 'text-success' : ($dias > 0 ? 'text-warning' : 'text-danger');
                     $bgActual     = str_contains($planActual,'premium') ? 'rgba(255,193,7,0.12)'
-                        : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar')
-                        ? 'rgba(13,110,253,0.08)' : 'rgba(108,117,125,0.08)');
+                        : (str_contains($planActual,'est') ? 'rgba(13,110,253,0.08)' : 'rgba(108,117,125,0.08)');
                     $borderActual = str_contains($planActual,'premium') ? '#ffc107'
-                        : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar')
-                        ? '#0d6efd' : '#6c757d');
+                        : (str_contains($planActual,'est') ? '#0d6efd' : '#6c757d');
                     ?>
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
@@ -229,23 +225,21 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="d-flex flex-column gap-2">
-                                <?php
-                                $est = $cliente['suscripcion_estado'] ?? '';
-                                $badges = [
-                                    'activa'     => '<span class="badge-activa"><span class="status-active-pulse me-1"></span>Activa</span>',
-                                    'por_vencer' => '<span class="badge-por-vencer"><i class="fas fa-clock me-1"></i>Por vencer</span>',
-                                    'vencida'    => '<span class="badge-vencida"><i class="fas fa-times-circle me-1"></i>Vencida</span>',
-                                    'suspendida' => '<span class="badge-suspendida"><i class="fas fa-pause-circle me-1"></i>Suspendida</span>',
-                                ];
-                                echo $badges[$est] ?? '';
-                                ?>
-                                <small class="<?= $claseD ?> fw-semibold">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    Vence: <?= date('d/m/Y', strtotime($cliente['fecha_vencimiento'])) ?>
-                                    (<?= max(0,$dias) ?> días)
-                                </small>
-                            </div>
+                            <?php
+                            $est    = $cliente['suscripcion_estado'] ?? '';
+                            $badges = [
+                                'activa'     => '<span class="badge-activa"><span class="status-active-pulse me-1"></span>Activa</span>',
+                                'por_vencer' => '<span class="badge-por-vencer"><i class="fas fa-clock me-1"></i>Por vencer</span>',
+                                'vencida'    => '<span class="badge-vencida"><i class="fas fa-times-circle me-1"></i>Vencida</span>',
+                                'suspendida' => '<span class="badge-suspendida"><i class="fas fa-pause-circle me-1"></i>Suspendida</span>',
+                            ];
+                            echo $badges[$est] ?? '';
+                            ?>
+                            <small class="<?= $claseD ?> fw-semibold d-block mt-2">
+                                <i class="fas fa-calendar me-1"></i>
+                                Vence: <?= date('d/m/Y', strtotime($cliente['fecha_vencimiento'])) ?>
+                                (<?= max(0,$dias) ?> días)
+                            </small>
                         </div>
                     </div>
                     <?php else: ?>
@@ -255,6 +249,59 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                         <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-1"></i>Crear suscripción
                         </a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- TOKEN API (solo al editar) -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                    <span><i class="fas fa-key me-2"></i>Token de API</span>
+                    <span class="badge bg-accent text-dark">Solo lectura</span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        Este token identifica al sistema del cliente ante la API de DeskCod.
+                        Compártelo de forma segura — no lo expongas públicamente.
+                    </p>
+
+                    <?php if ($apiToken): ?>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <input type="text"
+                               class="form-control token-field"
+                               id="apiTokenInput"
+                               value="<?= htmlspecialchars($apiToken) ?>"
+                               readonly>
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="copiarToken()"
+                                title="Copiar token">
+                            <i class="fas fa-copy" id="iconCopiar"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-warning"
+                                onclick="confirmarRegenerar(<?= $cliente['id'] ?>)"
+                                title="Regenerar token">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Header a usar: <code>Authorization: Bearer <?= substr($apiToken, 0, 8) ?>...</code>
+                    </small>
+                    <?php else: ?>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-muted small">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            Este cliente no tiene token generado aún.
+                        </div>
+                        <button type="button"
+                                class="btn btn-primary btn-sm"
+                                onclick="generarTokenNuevo(<?= $cliente['id'] ?>)">
+                            <i class="fas fa-plus me-1"></i>Generar token
+                        </button>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -278,12 +325,13 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                         <?php foreach ($planes as $plan):
                             $pNombre = strtolower($plan['nombre']);
                             $pClase  = str_contains($pNombre,'premium') ? 'plan-premium'
-                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar') ? 'plan-estandar' : 'plan-basico');
+                                : (str_contains($pNombre,'est') ? 'plan-estandar' : 'plan-basico');
                             $pIcon   = str_contains($pNombre,'premium') ? 'fas fa-crown'
-                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar') ? 'fas fa-star' : 'fas fa-leaf');
+                                : (str_contains($pNombre,'est') ? 'fas fa-star' : 'fas fa-leaf');
                         ?>
                         <div class="plan-card <?= $pClase ?>"
-                             data-id="<?= $plan['id'] ?>" data-duracion="<?= $plan['duracion_dias'] ?>"
+                             data-id="<?= $plan['id'] ?>"
+                             data-duracion="<?= $plan['duracion_dias'] ?>"
                              onclick="seleccionarPlan(this)">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="<?= $pIcon ?>" style="font-size:1.4rem;"></i>
@@ -298,6 +346,7 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                         </div>
                         <?php endforeach; ?>
                     </div>
+
                     <div id="camposFecha" style="display:none;">
                         <hr>
                         <div class="mb-2">
@@ -312,12 +361,21 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Notas</label>
-                            <textarea class="form-control form-control-sm" name="notas_suscripcion"
-                                      rows="2" placeholder="Observaciones..."></textarea>
+                            <textarea class="form-control form-control-sm"
+                                      name="notas_suscripcion" rows="2"
+                                      placeholder="Observaciones..."></textarea>
                         </div>
-                        <button type="button" class="btn btn-link btn-sm text-muted p-0" onclick="limpiarPlan()">
+                        <button type="button" class="btn btn-link btn-sm text-muted p-0"
+                                onclick="limpiarPlan()">
                             <i class="fas fa-times me-1"></i>Quitar plan
                         </button>
+                    </div>
+
+                    <!-- Info token al crear -->
+                    <hr class="mt-3">
+                    <div class="d-flex align-items-center gap-2 text-muted small">
+                        <i class="fas fa-key text-success"></i>
+                        <span>Se generará un token de API automáticamente al registrar el cliente.</span>
                     </div>
                 </div>
             </div>
@@ -326,6 +384,7 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
 
     </div>
 
+    <!-- Botones -->
     <div class="d-flex gap-2 justify-content-end mt-4">
         <a href="/Clientes" class="btn btn-outline-secondary">
             <i class="fas fa-times me-2"></i>Cancelar
@@ -339,7 +398,7 @@ body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.2
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// ── Preview logo en tiempo real ──
+// ── Preview logo ──
 function previsualizarLogo(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];
@@ -350,17 +409,16 @@ function previsualizarLogo(input) {
         return;
     }
     const reader = new FileReader();
-    reader.onload = function(e) {
-        const preview = document.getElementById('logoPreview');
-        preview.innerHTML = `<img src="${e.target.result}" alt="logo" style="width:100%;height:100%;object-fit:cover;">`;
+    reader.onload = e => {
+        document.getElementById('logoPreview').innerHTML =
+            `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
     };
     reader.readAsDataURL(file);
 }
 
-// ── Actualiza iniciales al escribir nombre ──
 function actualizarIniciales(nombre) {
     const ini = document.getElementById('logoIniciales');
-    if (!ini) return; // ya hay logo cargado
+    if (!ini) return;
     const p = nombre.trim().split(' ');
     ini.textContent = (p[0][0] || '').toUpperCase() + (p[1] ? p[1][0].toUpperCase() : '');
 }
@@ -402,7 +460,64 @@ if (fi) fi.addEventListener('change', () => {
     if (sel) calcularVencimiento(sel.dataset.duracion);
 });
 
-// ── Validación ──
+// ── Token API ──
+function copiarToken() {
+    const input = document.getElementById('apiTokenInput');
+    if (!input) return;
+    navigator.clipboard.writeText(input.value).then(() => {
+        const icon = document.getElementById('iconCopiar');
+        icon.classList.replace('fa-copy', 'fa-check');
+        setTimeout(() => icon.classList.replace('fa-check', 'fa-copy'), 2000);
+    });
+}
+
+function confirmarRegenerar(clienteId) {
+    Swal.fire({
+        title: '¿Regenerar token?',
+        html: 'El token anterior <strong>dejará de funcionar inmediatamente</strong>.<br>Deberás actualizar el token en el sistema del cliente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, regenerar',
+        cancelButtonText: 'Cancelar'
+    }).then(r => {
+        if (!r.isConfirmed) return;
+        llamarRegenerar(clienteId);
+    });
+}
+
+function generarTokenNuevo(clienteId) {
+    llamarRegenerar(clienteId, true);
+}
+
+function llamarRegenerar(clienteId, esNuevo = false) {
+    const fd = new FormData();
+    fd.append('id', clienteId);
+    fetch('/Clientes/regenerarToken', { method:'POST', body:fd, credentials:'same-origin' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: esNuevo ? 'Token generado' : 'Token regenerado',
+                    html: `<p class="mb-2">Copia el nuevo token:</p>
+                           <code class="d-block p-2 bg-light rounded" style="font-size:.75rem;word-break:break-all;">
+                               ${data.token}
+                           </code>`,
+                    confirmButtonColor: '#005C3E',
+                    confirmButtonText: 'Copiar y cerrar'
+                }).then(() => {
+                    navigator.clipboard.writeText(data.token);
+                    location.reload();
+                });
+            } else {
+                Swal.fire({ icon:'error', title:'Error', text: data.message });
+            }
+        });
+}
+
+// ── Validación del form ──
 document.getElementById('clienteForm').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value.trim();
     const email  = document.getElementById('email').value.trim();

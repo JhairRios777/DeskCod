@@ -140,7 +140,7 @@ body.dark-mode .tabla-permisos tbody tr:hover td {
                                 <tr>
                                     <th class="text-start ps-3" width="200">Módulo</th>
                                     <?php foreach ($acciones as $accion): ?>
-                                    <th><?= htmlspecialchars($accion['label']) ?></th>
+                                    <th><?= htmlspecialchars($accion['nombre']) ?></th>
                                     <?php endforeach; ?>
                                     <th>Todo</th>
                                 </tr>
@@ -149,8 +149,8 @@ body.dark-mode .tabla-permisos tbody tr:hover td {
                                 <?php foreach ($modulos as $modulo): ?>
                                 <tr>
                                     <td class="modulo-nombre ps-3">
-                                        <i class="<?= htmlspecialchars($modulo['icono']) ?> me-2 text-success"></i>
-                                        <?= htmlspecialchars($modulo['label']) ?>
+                                        <i class="fas fa-cube me-2 text-success"></i>
+                                        <?= htmlspecialchars($modulo['nombre']) ?>
                                     </td>
                                     <?php foreach ($acciones as $accion): ?>
                                     <td class="text-center">

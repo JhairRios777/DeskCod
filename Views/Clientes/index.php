@@ -10,8 +10,24 @@ tr.plan-premium  { background-color: rgba(255,193,7,0.07)   !important; }
 html.dark-mode tr.plan-basico   { background-color: rgba(108,117,125,0.08) !important; }
 html.dark-mode tr.plan-estandar { background-color: rgba(13,110,253,0.08)  !important; }
 html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !important; }
+
+/* Token */
+.token-preview {
+    font-family: 'Courier New', monospace;
+    font-size: .72rem; letter-spacing: .02em;
+    color: #005C3E; cursor: pointer;
+    white-space: nowrap;
+}
+html.dark-mode .token-preview { color: #00E676; }
+.btn-copiar-token {
+    border: none; background: transparent;
+    color: #6c757d; padding: 0 4px; font-size: .75rem;
+    cursor: pointer; vertical-align: middle;
+}
+.btn-copiar-token:hover { color: #005C3E; }
 </style>
 
+<!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-users me-2 text-success"></i>Clientes</h4>
@@ -33,6 +49,7 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
 </div>
 <?php endif; ?>
 
+<!-- Leyenda de planes -->
 <div class="d-flex gap-3 mb-3 flex-wrap">
     <small class="d-flex align-items-center gap-1">
         <span style="width:14px;height:14px;border-radius:3px;background:#6c757d;display:inline-block;"></span>Plan Básico
@@ -45,6 +62,7 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
     </small>
 </div>
 
+<!-- Filtros -->
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-2 align-items-end">
@@ -85,6 +103,7 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
     </div>
 </div>
 
+<!-- Tabla -->
 <div class="card shadow-sm">
     <div class="card-header bg-primary d-flex align-items-center justify-content-between">
         <span><i class="fas fa-table me-2"></i>Lista de Clientes</span>
@@ -101,13 +120,14 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
                         <th>Plan</th>
                         <th>Vencimiento</th>
                         <th>Estado</th>
+                        <th>Token API</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($clientes)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="8" class="text-center py-5 text-muted">
                             <i class="fas fa-users fa-3x mb-3 d-block opacity-25"></i>
                             No hay clientes registrados.<br>
                             <a href="/Clientes/Registry" class="btn btn-primary btn-sm mt-3">
@@ -117,19 +137,23 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
                     </tr>
                     <?php else: ?>
                     <?php foreach ($clientes as $i => $c):
-                        $p   = explode(' ', $c['nombre']);
-                        $ini = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
+                        $p         = explode(' ', $c['nombre']);
+                        $ini       = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
                         $planNombre = strtolower($c['plan_nombre'] ?? '');
-                        if (str_contains($planNombre,'premium'))       $planClase = 'plan-premium';
+                        if (str_contains($planNombre,'premium'))                                          $planClase = 'plan-premium';
                         elseif (str_contains($planNombre,'estándar') || str_contains($planNombre,'estandar')) $planClase = 'plan-estandar';
                         else $planClase = $planNombre ? 'plan-basico' : '';
-                        $tienelogo = !empty($c['logo']) && file_exists(ROOT . $c['logo']);
+                        $tienelogo  = !empty($c['logo']) && file_exists(ROOT . $c['logo']);
+                        $token      = $tokens[$c['id']] ?? null;
+                        $tokenCorto = $token ? substr($token, 0, 8) . '...' . substr($token, -4) : null;
                     ?>
                     <tr class="<?= $planClase ?>"
                         data-estado="<?= htmlspecialchars($c['suscripcion_estado'] ?? '') ?>"
                         data-plan="<?= $planClase ?>"
                         data-buscar="<?= strtolower(htmlspecialchars($c['nombre'].' '.$c['email'].' '.($c['empresa_nombre']??''))) ?>">
+
                         <td><?= str_pad($i+1,3,'0',STR_PAD_LEFT) ?></td>
+
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="avatar-circle">
@@ -145,23 +169,28 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
                                 </div>
                             </div>
                         </td>
+
                         <td><?= htmlspecialchars($c['empresa_nombre'] ?? '—') ?></td>
+
                         <td>
                             <?php if ($c['plan_nombre']): ?>
                             <?php $bc = match(true) {
-                                str_contains($planNombre,'premium')  => 'warning text-dark',
-                                str_contains($planNombre,'estándar'),
-                                str_contains($planNombre,'estandar') => 'primary',
+                                str_contains($planNombre,'premium')                                          => 'warning text-dark',
+                                str_contains($planNombre,'estándar') || str_contains($planNombre,'estandar') => 'primary',
                                 default => 'secondary',
                             }; ?>
                             <span class="badge bg-<?= $bc ?>"><?= htmlspecialchars($c['plan_nombre']) ?></span>
-                            <?php else: ?><span class="text-muted">Sin plan</span><?php endif; ?>
+                            <?php else: ?>
+                            <span class="text-muted">Sin plan</span>
+                            <?php endif; ?>
                         </td>
+
                         <td>
                             <?= $c['fecha_vencimiento']
                                 ? date('d/m/Y', strtotime($c['fecha_vencimiento']))
                                 : '<span class="text-muted">—</span>' ?>
                         </td>
+
                         <td>
                             <?php
                             $est = $c['suscripcion_estado'] ?? '';
@@ -174,6 +203,28 @@ html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !impo
                             echo $b[$est] ?? '<span class="text-muted">Sin suscripción</span>';
                             ?>
                         </td>
+
+                        <!-- Columna Token API -->
+                        <td>
+                            <?php if ($token): ?>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="token-preview" title="Clic para ver token completo"
+                                      onclick="verToken('<?= htmlspecialchars($token, ENT_QUOTES) ?>', '<?= htmlspecialchars($c['nombre'], ENT_QUOTES) ?>')">
+                                    <i class="fas fa-key me-1"></i><?= $tokenCorto ?>
+                                </span>
+                                <button class="btn-copiar-token"
+                                        onclick="copiarToken('<?= htmlspecialchars($token, ENT_QUOTES) ?>', this)"
+                                        title="Copiar token">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <?php else: ?>
+                            <span class="text-muted small">
+                                <i class="fas fa-exclamation-circle me-1"></i>Sin token
+                            </span>
+                            <?php endif; ?>
+                        </td>
+
                         <td class="text-center">
                             <a href="/Clientes/Registry/<?= $c['id'] ?>"
                                class="btn btn-sm btn-outline-warning me-1" title="Editar">
@@ -233,6 +284,50 @@ buscador.addEventListener('input', filtrar);
 filtro.addEventListener('change', filtrar);
 filtroPlan.addEventListener('change', filtrar);
 
+// ── Token API ──
+function copiarToken(token, btn) {
+    navigator.clipboard.writeText(token).then(() => {
+        const icon = btn.querySelector('i');
+        icon.classList.replace('fa-copy', 'fa-check');
+        btn.style.color = '#005C3E';
+        setTimeout(() => {
+            icon.classList.replace('fa-check', 'fa-copy');
+            btn.style.color = '';
+        }, 2000);
+    });
+}
+
+function verToken(token, nombre) {
+    Swal.fire({
+        title: `Token API — ${nombre}`,
+        html: `
+            <p class="text-muted small mb-3">
+                Usa este token en el header <code>Authorization: Bearer {token}</code>
+            </p>
+            <div class="input-group">
+                <input type="text" class="form-control form-control-sm font-monospace"
+                       id="swalToken" value="${token}" readonly
+                       style="font-size:.72rem;">
+                <button class="btn btn-outline-secondary btn-sm" onclick="copiarDesdeModal()">
+                    <i class="fas fa-copy" id="swalCopyIcon"></i>
+                </button>
+            </div>
+        `,
+        confirmButtonColor: '#005C3E',
+        confirmButtonText: 'Cerrar',
+        width: 560,
+    });
+}
+
+function copiarDesdeModal() {
+    const input = document.getElementById('swalToken');
+    navigator.clipboard.writeText(input.value).then(() => {
+        const icon = document.getElementById('swalCopyIcon');
+        icon.classList.replace('fa-copy', 'fa-check');
+        setTimeout(() => icon.classList.replace('fa-check', 'fa-copy'), 2000);
+    });
+}
+
 // ── Desactivar ──
 function eliminar(id, nombre) {
     Swal.fire({
@@ -256,5 +351,4 @@ function eliminar(id, nombre) {
             });
     });
 }
-
 </script>
