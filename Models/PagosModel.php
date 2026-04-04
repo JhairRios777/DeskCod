@@ -30,28 +30,24 @@ class PagosModel {
     }
 
     public function registrar(array $datos): array {
-        $stmt = $this->db->prepare("CALL sp_pagos_registrar_con_cuenta(?,?,?,?,?,?,?,?,?)");
-        $stmt->execute([
-            $datos['cliente_id'],
-            $datos['cuenta_id'] ?: null,
-            $datos['suscripcion_id'] ?: null,
-            $datos['metodo_pago_id'],
-            $datos['concepto'],
-            $datos['monto'],
-            $datos['referencia'] ?: null,
-            $datos['notas'] ?: null,
-            $datos['fecha_pago'] ?: null,
-        ]);
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-
-        if (!empty($datos['comprobante_imagen']) && !empty($result['pago_id'])) {
-            $upd = $this->db->prepare("UPDATE pagos SET comprobante_imagen = ? WHERE id = ?");
-            $upd->execute([$datos['comprobante_imagen'], $result['pago_id']]);
-        }
-
-        return $result ?: [];
-    }
+    $stmt = $this->db->prepare("CALL sp_pagos_registrar_con_cuenta(?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->execute([
+        $datos['cliente_id'],
+        $datos['suscripcion_id'] ?: null,
+        $datos['cuenta_id']      ?: null,
+        $datos['metodo_pago_id'],
+        $_SESSION['system']['UserID'] ?? 1,  // empleado_id
+        $datos['concepto'],
+        $datos['monto'],
+        $datos['referencia'] ?: null,
+        $datos['notas']      ?: null,
+        $datos['comprobante_imagen'] ?: null, // comprobante
+        $datos['fecha_pago'] ?: null,
+    ]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    return $result ?: [];
+}
 
     // ── Cuentas por cobrar ────────────────────
 
@@ -71,19 +67,19 @@ class PagosModel {
     }
 
     public function crearCuenta(array $datos): int {
-        $stmt = $this->db->prepare("CALL sp_cuentas_crear(?,?,?,?,?,?)");
-        $stmt->execute([
-            $datos['cliente_id'],
-            $datos['tipo'],
-            $datos['descripcion'],
-            $datos['monto_total'],
-            $datos['suscripcion_id'] ?: null,
-            $datos['notas'] ?: null,
-        ]);
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return (int)($result['id'] ?? 0);
-    }
+    $stmt = $this->db->prepare("CALL sp_cuentas_crear(?,?,?,?,?,?)");
+    $stmt->execute([
+        $datos['cliente_id'],
+        $datos['suscripcion_id'] ?: null, // ← suscripcion_id va aquí
+        $datos['tipo'],
+        $datos['descripcion'],
+        $datos['monto_total'],
+        $datos['notas'] ?: null,
+    ]);
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    $stmt->closeCursor();
+    return (int)($result['id'] ?? 0);
+}
 
     // ── Helpers ───────────────────────────────
 
@@ -121,7 +117,7 @@ class PagosModel {
             SELECT id, tipo, descripcion, monto_total, monto_pagado,
                    monto_total - monto_pagado AS saldo_pendiente, estado
             FROM cuentas_por_cobrar
-            WHERE cliente_id = ? AND estado != 'pagado'
+            WHERE cliente_id = ? AND estado != 'pagada'
             ORDER BY created_at DESC
         ");
         $stmt->execute([$clienteId]);
