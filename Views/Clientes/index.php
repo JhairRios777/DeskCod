@@ -1,113 +1,23 @@
 <!-- Views/Clientes/index.php -->
-
+<?php
+echo extension_loaded('zip') ? "ZIP: OK\n" : "ZIP: NO\n";
+echo extension_loaded('gd')  ? "GD: OK\n"  : "GD: NO\n";
+?>
 <style>
-/* ── Avatar ── */
-.avatar-circle {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg,#005C3E,#00E676);
-    color:#fff; display:flex; align-items:center;
-    justify-content:center; font-weight:700; font-size:.8rem; flex-shrink:0;
-}
-
-/* ── Colores de fila según plan ── */
-tr.plan-basico   td { border-left: 4px solid #6c757d !important; }
-tr.plan-estandar td:first-child,
-tr.plan-estandar td { border-left: 4px solid #0d6efd !important; }
-tr.plan-premium  td { border-left: 4px solid #ffc107 !important; }
-
-tr.plan-basico   { background-color: rgba(108,117,125,0.05) !important; }
-tr.plan-estandar { background-color: rgba(13,110,253,0.05)  !important; }
-tr.plan-premium  { background-color: rgba(255,193,7,0.07)   !important; }
-
-/* Solo aplica el borde a la primera celda */
-tr.plan-basico   td:not(:first-child),
-tr.plan-estandar td:not(:first-child),
-tr.plan-premium  td:not(:first-child) { border-left: none !important; }
-
 tr.plan-basico   td:first-child { border-left: 4px solid #6c757d !important; }
 tr.plan-estandar td:first-child { border-left: 4px solid #0d6efd !important; }
 tr.plan-premium  td:first-child { border-left: 4px solid #ffc107 !important; }
-
-/* ── TABLA — FIX DARK MODE DEFINITIVO ──────
-   Pisamos las variables internas de Bootstrap 5
-   directamente con !important en el <style> inline
-   que tiene mayor especificidad que cualquier CSS externo
-   ────────────────────────────────────────────────────── */
-
-/* Tema claro — hover */
-.table-hover > tbody > tr:hover > :not(caption) > * > *,
-.table-hover > tbody > tr:hover > * {
-    background-color: rgba(0,92,62,0.08) !important;
-    --bs-table-bg-state: rgba(0,92,62,0.08) !important;
-    --bs-table-bg-type:  rgba(0,92,62,0.08) !important;
-}
-
-/* ── MODO OSCURO ── */
-body.dark-mode .table {
-    --bs-table-color:        #e0e0e0 !important;
-    --bs-table-bg:           transparent !important;
-    --bs-table-border-color: #1e3329 !important;
-    --bs-table-striped-bg:   rgba(0,230,118,0.03) !important;
-    --bs-table-hover-bg:     rgba(0,230,118,0.09) !important;
-    --bs-table-hover-color:  #e0e0e0 !important;
-    color: #e0e0e0 !important;
-}
-
-body.dark-mode .table > :not(caption) > * > * {
-    background-color: transparent !important;
-    color: #e0e0e0 !important;
-    border-bottom-color: #1e3329 !important;
-    --bs-table-bg-state: transparent !important;
-    --bs-table-bg-type:  transparent !important;
-}
-
-body.dark-mode .table thead > tr > * {
-    background-color: #1a3329 !important;
-    color: #ffffff !important;
-    border-color: #1e3329 !important;
-    --bs-table-bg-state: #1a3329 !important;
-    --bs-table-bg-type:  #1a3329 !important;
-}
-
-body.dark-mode .table p,
-body.dark-mode .table .fw-semibold,
-body.dark-mode .table .fw-bold { color: #ffffff !important; }
-body.dark-mode .table small,
-body.dark-mode .table .text-muted { color: #adb5bd !important; }
-
-body.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
-body.dark-mode .table-hover > tbody > tr:hover > * {
-    background-color: rgba(0,230,118,0.12) !important;
-    color: #e0e0e0 !important;
-    --bs-table-bg-state: rgba(0,230,118,0.12) !important;
-    --bs-table-bg-type:  rgba(0,230,118,0.12) !important;
-}
-
-body.dark-mode .table-hover > tbody > tr:hover small,
-body.dark-mode .table-hover > tbody > tr:hover .text-muted { color: #adb5bd !important; }
-
-/* Colores de plan en modo oscuro */
-body.dark-mode tr.plan-basico   { background-color: rgba(108,117,125,0.08) !important; }
-body.dark-mode tr.plan-estandar { background-color: rgba(13,110,253,0.08)  !important; }
-body.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !important; }
-
-body.dark-mode .card-footer {
-    background: #111f18 !important;
-    border-color: #1e3329 !important;
-    color: #adb5bd !important;
-}
-body.dark-mode .input-group-text { background:#1a3329; border-color:#1e3329; color:#e0e0e0; }
-body.dark-mode .form-control, body.dark-mode .form-select {
-    background:#111f18; border-color:#1e3329; color:#e0e0e0;
-}
+tr.plan-basico   { background-color: rgba(108,117,125,0.05) !important; }
+tr.plan-estandar { background-color: rgba(13,110,253,0.05)  !important; }
+tr.plan-premium  { background-color: rgba(255,193,7,0.07)   !important; }
+html.dark-mode tr.plan-basico   { background-color: rgba(108,117,125,0.08) !important; }
+html.dark-mode tr.plan-estandar { background-color: rgba(13,110,253,0.08)  !important; }
+html.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !important; }
 </style>
 
-<!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h4 class="fw-bold mb-0">
-            <i class="fas fa-users me-2 text-success"></i>Clientes
-        </h4>
+        <h4 class="fw-bold mb-0"><i class="fas fa-users me-2 text-success"></i>Clientes</h4>
         <small class="text-muted">Gestión de clientes y suscripciones</small>
     </div>
     <a href="/Clientes/Registry" class="btn btn-primary">
@@ -115,38 +25,29 @@ body.dark-mode .form-control, body.dark-mode .form-select {
     </a>
 </div>
 
-<!-- Flash messages -->
 <?php if (!empty($flash_success)): ?>
 <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
-    <i class="fas fa-check-circle fa-lg"></i>
-    <span><?= htmlspecialchars($flash_success) ?></span>
+    <i class="fas fa-check-circle fa-lg"></i><span><?= htmlspecialchars($flash_success) ?></span>
 </div>
 <?php endif; ?>
-
 <?php if (!empty($flash_error)): ?>
 <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
-    <i class="fas fa-times-circle fa-lg"></i>
-    <span><?= htmlspecialchars($flash_error) ?></span>
+    <i class="fas fa-times-circle fa-lg"></i><span><?= htmlspecialchars($flash_error) ?></span>
 </div>
 <?php endif; ?>
 
-<!-- Leyenda de planes -->
 <div class="d-flex gap-3 mb-3 flex-wrap">
     <small class="d-flex align-items-center gap-1">
-        <span style="width:14px;height:14px;border-radius:3px;background:#6c757d;display:inline-block;"></span>
-        Plan Básico
+        <span style="width:14px;height:14px;border-radius:3px;background:#6c757d;display:inline-block;"></span>Plan Básico
     </small>
     <small class="d-flex align-items-center gap-1">
-        <span style="width:14px;height:14px;border-radius:3px;background:#0d6efd;display:inline-block;"></span>
-        Plan Estándar
+        <span style="width:14px;height:14px;border-radius:3px;background:#0d6efd;display:inline-block;"></span>Plan Estándar
     </small>
     <small class="d-flex align-items-center gap-1">
-        <span style="width:14px;height:14px;border-radius:3px;background:#ffc107;display:inline-block;"></span>
-        Plan Premium
+        <span style="width:14px;height:14px;border-radius:3px;background:#ffc107;display:inline-block;"></span>Plan Premium
     </small>
 </div>
 
-<!-- Buscador -->
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-2 align-items-end">
@@ -156,8 +57,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <span class="input-group-text" style="background:#005C3E;color:#fff;border-color:#005C3E;">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" class="form-control" id="buscador"
-                           placeholder="Nombre, email o empresa...">
+                    <input type="text" class="form-control" id="buscador" placeholder="Nombre, email o empresa...">
                 </div>
             </div>
             <div class="col-md-3">
@@ -179,7 +79,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <option value="plan-premium">Premium</option>
                 </select>
             </div>
-            <div class="col-md-2 d-flex justify-content-end">
+            <div class="col-md-2">
                 <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
                     <i class="fas fa-times me-1"></i>Limpiar
                 </button>
@@ -188,7 +88,6 @@ body.dark-mode .form-control, body.dark-mode .form-select {
     </div>
 </div>
 
-<!-- Tabla -->
 <div class="card shadow-sm">
     <div class="card-header bg-primary d-flex align-items-center justify-content-between">
         <span><i class="fas fa-table me-2"></i>Lista de Clientes</span>
@@ -213,8 +112,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <tr>
                         <td colspan="7" class="text-center py-5 text-muted">
                             <i class="fas fa-users fa-3x mb-3 d-block opacity-25"></i>
-                            No hay clientes registrados.
-                            <br>
+                            No hay clientes registrados.<br>
                             <a href="/Clientes/Registry" class="btn btn-primary btn-sm mt-3">
                                 <i class="fas fa-plus me-1"></i>Agregar primer cliente
                             </a>
@@ -224,26 +122,26 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                     <?php foreach ($clientes as $i => $c):
                         $p   = explode(' ', $c['nombre']);
                         $ini = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
-
-                        // Clase CSS según el plan
                         $planNombre = strtolower($c['plan_nombre'] ?? '');
-                        $planClase  = '';
-                        if (str_contains($planNombre, 'básico') || str_contains($planNombre, 'basico')) {
-                            $planClase = 'plan-basico';
-                        } elseif (str_contains($planNombre, 'estándar') || str_contains($planNombre, 'estandar')) {
-                            $planClase = 'plan-estandar';
-                        } elseif (str_contains($planNombre, 'premium')) {
-                            $planClase = 'plan-premium';
-                        }
+                        if (str_contains($planNombre,'premium'))       $planClase = 'plan-premium';
+                        elseif (str_contains($planNombre,'estándar') || str_contains($planNombre,'estandar')) $planClase = 'plan-estandar';
+                        else $planClase = $planNombre ? 'plan-basico' : '';
+                        $tienelogo = !empty($c['logo']) && file_exists(ROOT . $c['logo']);
                     ?>
                     <tr class="<?= $planClase ?>"
                         data-estado="<?= htmlspecialchars($c['suscripcion_estado'] ?? '') ?>"
                         data-plan="<?= $planClase ?>"
                         data-buscar="<?= strtolower(htmlspecialchars($c['nombre'].' '.$c['email'].' '.($c['empresa_nombre']??''))) ?>">
-                        <td class="text-muted"><?= str_pad($i+1,3,'0',STR_PAD_LEFT) ?></td>
+                        <td><?= str_pad($i+1,3,'0',STR_PAD_LEFT) ?></td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle"><?= $ini ?></div>
+                                <div class="avatar-circle">
+                                    <?php if ($tienelogo): ?>
+                                        <img src="/<?= htmlspecialchars($c['logo']) ?>" alt="logo">
+                                    <?php else: ?>
+                                        <?= $ini ?>
+                                    <?php endif; ?>
+                                </div>
                                 <div>
                                     <p class="mb-0 fw-semibold"><?= htmlspecialchars($c['nombre']) ?></p>
                                     <small class="text-muted"><?= htmlspecialchars($c['email']) ?></small>
@@ -253,20 +151,14 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                         <td><?= htmlspecialchars($c['empresa_nombre'] ?? '—') ?></td>
                         <td>
                             <?php if ($c['plan_nombre']): ?>
-                                <?php
-                                $badgeColor = match(true) {
-                                    str_contains($planNombre,'premium')  => 'warning text-dark',
-                                    str_contains($planNombre,'estándar'),
-                                    str_contains($planNombre,'estandar') => 'primary',
-                                    default                              => 'secondary',
-                                };
-                                ?>
-                                <span class="badge bg-<?= $badgeColor ?>">
-                                    <?= htmlspecialchars($c['plan_nombre']) ?>
-                                </span>
-                            <?php else: ?>
-                                <span class="text-muted">Sin plan</span>
-                            <?php endif; ?>
+                            <?php $bc = match(true) {
+                                str_contains($planNombre,'premium')  => 'warning text-dark',
+                                str_contains($planNombre,'estándar'),
+                                str_contains($planNombre,'estandar') => 'primary',
+                                default => 'secondary',
+                            }; ?>
+                            <span class="badge bg-<?= $bc ?>"><?= htmlspecialchars($c['plan_nombre']) ?></span>
+                            <?php else: ?><span class="text-muted">Sin plan</span><?php endif; ?>
                         </td>
                         <td>
                             <?= $c['fecha_vencimiento']
@@ -276,7 +168,7 @@ body.dark-mode .form-control, body.dark-mode .form-select {
                         <td>
                             <?php
                             $est = $c['suscripcion_estado'] ?? '';
-                            $b   = [
+                            $b = [
                                 'activa'     => '<span class="badge-activa"><span class="status-active-pulse me-1"></span>Activa</span>',
                                 'por_vencer' => '<span class="badge-por-vencer"><i class="fas fa-clock me-1"></i>Por vencer</span>',
                                 'vencida'    => '<span class="badge-vencida"><i class="fas fa-times-circle me-1"></i>Vencida</span>',
@@ -313,32 +205,28 @@ body.dark-mode .form-control, body.dark-mode .form-select {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// ── Filtros ──
 const buscador   = document.getElementById('buscador');
 const filtro     = document.getElementById('filtroEstado');
 const filtroPlan = document.getElementById('filtroPlan');
 
 function filtrar() {
-    const txt    = buscador.value.toLowerCase();
-    const estado = filtro.value;
-    const plan   = filtroPlan.value;
-    let visibles = 0;
-
-    document.querySelectorAll('#tablaClientes tbody tr[data-buscar]').forEach(fila => {
-        const okTxt    = fila.dataset.buscar.includes(txt);
-        const okEstado = !estado || fila.dataset.estado === estado;
-        const okPlan   = !plan   || fila.dataset.plan   === plan;
-        const ok = okTxt && okEstado && okPlan;
-        fila.style.display = ok ? '' : 'none';
-        if (ok) visibles++;
+    const txt = buscador.value.toLowerCase();
+    const est = filtro.value;
+    const pl  = filtroPlan.value;
+    let v = 0;
+    document.querySelectorAll('#tablaClientes tbody tr[data-buscar]').forEach(f => {
+        const ok = f.dataset.buscar.includes(txt)
+            && (!est || f.dataset.estado === est)
+            && (!pl  || f.dataset.plan   === pl);
+        f.style.display = ok ? '' : 'none';
+        if (ok) v++;
     });
-
-    document.getElementById('contador').textContent = visibles + ' registros';
+    document.getElementById('contador').textContent = v + ' registros';
 }
 
 function limpiarFiltros() {
-    buscador.value   = '';
-    filtro.value     = '';
-    filtroPlan.value = '';
+    buscador.value = filtro.value = filtroPlan.value = '';
     document.querySelectorAll('#tablaClientes tbody tr').forEach(r => r.style.display = '');
     document.getElementById('contador').textContent =
         document.querySelectorAll('#tablaClientes tbody tr[data-buscar]').length + ' registros';
@@ -348,33 +236,28 @@ buscador.addEventListener('input', filtrar);
 filtro.addEventListener('change', filtrar);
 filtroPlan.addEventListener('change', filtrar);
 
+// ── Desactivar ──
 function eliminar(id, nombre) {
     Swal.fire({
         title: '¿Desactivar cliente?',
         html: `<strong>${nombre}</strong> será desactivado.<br>Su historial se conservará.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#005C3E',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, desactivar',
-        cancelButtonText: 'Cancelar'
-    }).then(result => {
-        if (!result.isConfirmed) return;
+        icon: 'warning', showCancelButton: true,
+        confirmButtonColor: '#005C3E', cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, desactivar', cancelButtonText: 'Cancelar'
+    }).then(r => {
+        if (!r.isConfirmed) return;
         const fd = new FormData();
         fd.append('id', id);
-        fetch('/Clientes/desactivar', {
-            method: 'POST', body: fd, credentials: 'same-origin'
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({ title:'¡Desactivado!', text:data.message,
-                    icon:'success', confirmButtonColor:'#005C3E'
-                }).then(() => location.reload());
-            } else {
-                Swal.fire('Error', data.message, 'error');
-            }
-        });
+        fetch('/Clientes/desactivar', { method:'POST', body:fd, credentials:'same-origin' })
+            .then(r => r.json())
+            .then(d => {
+                Swal.fire({
+                    icon: d.success ? 'success' : 'error',
+                    title: d.success ? '¡Desactivado!' : 'Error',
+                    text: d.message, confirmButtonColor: '#005C3E'
+                }).then(() => { if (d.success) location.reload(); });
+            });
     });
 }
+
 </script>

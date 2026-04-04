@@ -2,42 +2,56 @@
 
 <style>
 .input-group-text { background:#005C3E; color:#fff; border-color:#005C3E; }
-
-/* Cards visuales de plan */
-.plan-card {
-    border-radius: 12px; padding: 1rem;
-    cursor: pointer; transition: all 0.2s;
-    border: 2px solid transparent; text-align: center;
-}
-.plan-card:hover { transform: translateY(-2px); }
-.plan-card.plan-basico   { background: rgba(108,117,125,0.1); border-color: #6c757d; }
-.plan-card.plan-estandar { background: rgba(13,110,253,0.1);  border-color: #0d6efd; }
-.plan-card.plan-premium  { background: rgba(255,193,7,0.12);  border-color: #ffc107; }
-.plan-card.selected.plan-basico   { background: rgba(108,117,125,0.25); box-shadow: 0 4px 15px rgba(108,117,125,0.3); }
-.plan-card.selected.plan-estandar { background: rgba(13,110,253,0.2);   box-shadow: 0 4px 15px rgba(13,110,253,0.3); }
-.plan-card.selected.plan-premium  { background: rgba(255,193,7,0.25);   box-shadow: 0 4px 15px rgba(255,193,7,0.3); }
-
-/* Dark mode */
 body.dark-mode .input-group-text { background:#1a3329; border-color:#1e3329; color:#e0e0e0; }
 body.dark-mode .form-control, body.dark-mode .form-select {
     background:#111f18; border-color:#1e3329; color:#e0e0e0;
 }
 body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
-    background:#0f1a15; border-color:#00E676;
-    box-shadow:0 0 0 3px rgba(0,230,118,0.1); color:#e0e0e0;
+    background:#0f1a15; border-color:#00E676; box-shadow:0 0 0 3px rgba(0,230,118,0.1);
 }
 body.dark-mode .form-label { color:#c8e6d5; }
-body.dark-mode .plan-card.plan-basico   { background: rgba(108,117,125,0.15); }
-body.dark-mode .plan-card.plan-estandar { background: rgba(13,110,253,0.15); }
-body.dark-mode .plan-card.plan-premium  { background: rgba(255,193,7,0.15); }
-body.dark-mode .plan-card.selected.plan-basico   { background: rgba(108,117,125,0.3); }
-body.dark-mode .plan-card.selected.plan-estandar { background: rgba(13,110,253,0.3); }
-body.dark-mode .plan-card.selected.plan-premium  { background: rgba(255,193,7,0.25); }
-body.dark-mode .info-row { border-color: #1e3329; }
-body.dark-mode .info-row .label { color: #adb5bd; }
+
+.plan-card {
+    border-radius:12px; padding:1rem; cursor:pointer;
+    transition:all 0.2s; border:2px solid transparent; text-align:center;
+}
+.plan-card:hover { transform:translateY(-2px); }
+.plan-card.plan-basico   { background:rgba(108,117,125,0.1); border-color:#6c757d; }
+.plan-card.plan-estandar { background:rgba(13,110,253,0.1);  border-color:#0d6efd; }
+.plan-card.plan-premium  { background:rgba(255,193,7,0.12);  border-color:#ffc107; }
+.plan-card.selected.plan-basico   { background:rgba(108,117,125,0.25); box-shadow:0 4px 15px rgba(108,117,125,0.3); }
+.plan-card.selected.plan-estandar { background:rgba(13,110,253,0.2);   box-shadow:0 4px 15px rgba(13,110,253,0.3); }
+.plan-card.selected.plan-premium  { background:rgba(255,193,7,0.25);   box-shadow:0 4px 15px rgba(255,193,7,0.3); }
+body.dark-mode .plan-card.plan-basico   { background:rgba(108,117,125,0.15); }
+body.dark-mode .plan-card.plan-estandar { background:rgba(13,110,253,0.15); }
+body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
+body.dark-mode .plan-card.selected.plan-basico   { background:rgba(108,117,125,0.3); }
+body.dark-mode .plan-card.selected.plan-estandar { background:rgba(13,110,253,0.3); }
+body.dark-mode .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.25); }
+
+/* Logo upload */
+.logo-wrap {
+    position: relative; display: inline-block;
+}
+.logo-preview-circle {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg,#005C3E,#00E676);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.5rem;
+    overflow: hidden; border: 3px solid var(--accent);
+    cursor: pointer;
+}
+.logo-preview-circle img { width:100%; height:100%; object-fit:cover; }
+.logo-edit-btn {
+    position: absolute; bottom: 0; right: 0;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #005C3E; color: #fff; border: 2px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.65rem;
+}
+.logo-edit-btn:hover { background: #00895a; }
 </style>
 
-<!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h4 class="fw-bold mb-0">
@@ -55,25 +69,23 @@ body.dark-mode .info-row .label { color: #adb5bd; }
 
 <?php if (!empty($error)): ?>
 <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
-    <i class="fas fa-times-circle fa-lg"></i>
-    <span><?= htmlspecialchars($error) ?></span>
+    <i class="fas fa-times-circle fa-lg"></i><span><?= htmlspecialchars($error) ?></span>
 </div>
 <?php endif; ?>
-
 <?php if (!empty($success)): ?>
 <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
-    <i class="fas fa-check-circle fa-lg"></i>
-    <span><?= htmlspecialchars($success) ?></span>
+    <i class="fas fa-check-circle fa-lg"></i><span><?= htmlspecialchars($success) ?></span>
 </div>
 <?php endif; ?>
 
-<form id="clienteForm" action="" method="POST">
+<!-- Form con enctype para logo -->
+<form id="clienteForm" action="" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="Registrar" value="1">
     <input type="hidden" name="id" value="<?= $cliente['id'] ?? '' ?>">
 
     <div class="row g-4">
 
-        <!-- ── DATOS DEL CLIENTE ── -->
+        <!-- DATOS DEL CLIENTE -->
         <div class="col-lg-<?= $cliente ? '12' : '8' ?>">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary">
@@ -81,6 +93,42 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+
+                        <!-- Logo del cliente -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Logo de la empresa</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <?php
+                                $p   = explode(' ', $cliente['nombre'] ?? 'C');
+                                $ini = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
+                                $tienelogo = !empty($cliente['logo']) && file_exists(ROOT . ($cliente['logo'] ?? ''));
+                                ?>
+                                <div class="logo-wrap">
+                                    <div class="logo-preview-circle" id="logoPreview"
+                                         onclick="document.getElementById('inputLogo').click()">
+                                        <?php if ($tienelogo): ?>
+                                            <img src="/<?= htmlspecialchars($cliente['logo']) ?>" alt="logo" id="logoImg">
+                                        <?php else: ?>
+                                            <span id="logoIniciales"><?= $ini ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="logo-edit-btn" onclick="document.getElementById('inputLogo').click()">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="mb-1 small fw-semibold">Haz clic en el círculo para subir un logo</p>
+                                    <small class="text-muted">JPG, PNG — máx. 3MB — Opcional</small>
+                                    <?php if ($tienelogo): ?>
+                                    <br>
+                                    <small class="text-success"><i class="fas fa-check me-1"></i>Logo cargado</small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <input type="file" id="inputLogo" name="logo"
+                                   accept="image/jpeg,image/png" style="display:none;"
+                                   onchange="previsualizarLogo(this)">
+                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">
@@ -90,7 +138,8 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 <input type="text" class="form-control" name="nombre" id="nombre"
                                        value="<?= htmlspecialchars($cliente['nombre'] ?? '') ?>"
-                                       placeholder="Ej. Juan Pérez" maxlength="100">
+                                       placeholder="Ej. Juan Pérez" maxlength="100"
+                                       oninput="actualizarIniciales(this.value)">
                             </div>
                         </div>
 
@@ -151,12 +200,10 @@ body.dark-mode .info-row .label { color: #adb5bd; }
             </div>
 
             <?php if ($cliente): ?>
-            <!-- ── PANEL DE INFO SUSCRIPCIÓN AL EDITAR ── -->
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-primary d-flex align-items-center justify-content-between">
                     <span><i class="fas fa-sync-alt me-2"></i>Suscripción Actual</span>
-                    <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>"
-                       class="btn btn-accent btn-sm">
+                    <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>" class="btn btn-accent btn-sm">
                         <i class="fas fa-external-link-alt me-1"></i>Gestionar suscripción
                     </a>
                 </div>
@@ -164,13 +211,14 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                     <?php if (!empty($cliente['plan_nombre'])): ?>
                     <?php
                     $planActual   = strtolower($cliente['plan_nombre']);
-                    $bgActual     = str_contains($planActual,'premium')
-                        ? 'rgba(255,193,7,0.12)' : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar')
-                        ? 'rgba(13,110,253,0.08)' : 'rgba(108,117,125,0.08)');
-                    $borderActual = str_contains($planActual,'premium') ? '#ffc107'
-                        : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar') ? '#0d6efd' : '#6c757d');
                     $dias   = (int)((strtotime($cliente['fecha_vencimiento']) - time()) / 86400);
                     $claseD = $dias > 7 ? 'text-success' : ($dias > 0 ? 'text-warning' : 'text-danger');
+                    $bgActual     = str_contains($planActual,'premium') ? 'rgba(255,193,7,0.12)'
+                        : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar')
+                        ? 'rgba(13,110,253,0.08)' : 'rgba(108,117,125,0.08)');
+                    $borderActual = str_contains($planActual,'premium') ? '#ffc107'
+                        : (str_contains($planActual,'estándar') || str_contains($planActual,'estandar')
+                        ? '#0d6efd' : '#6c757d');
                     ?>
                     <div class="row g-3 align-items-center">
                         <div class="col-md-4">
@@ -180,7 +228,7 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                                 <span class="badge bg-success">$<?= number_format($cliente['plan_precio'],2) ?>/mes</span>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-6">
                             <div class="d-flex flex-column gap-2">
                                 <?php
                                 $est = $cliente['suscripcion_estado'] ?? '';
@@ -195,23 +243,16 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                                 <small class="<?= $claseD ?> fw-semibold">
                                     <i class="fas fa-calendar me-1"></i>
                                     Vence: <?= date('d/m/Y', strtotime($cliente['fecha_vencimiento'])) ?>
-                                    (<?= max(0,$dias) ?> días restantes)
+                                    (<?= max(0,$dias) ?> días)
                                 </small>
-                                <?php if (!empty($cliente['renovacion_plan_id'])): ?>
-                                <small class="text-info">
-                                    <i class="fas fa-arrow-right me-1"></i>
-                                    Cambio programado al vencer
-                                </small>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
                     <?php else: ?>
                     <div class="text-center py-3 text-muted">
                         <i class="fas fa-exclamation-circle fa-2x mb-2 d-block opacity-50"></i>
-                        <p class="mb-2">Este cliente no tiene suscripción activa.</p>
-                        <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>"
-                           class="btn btn-primary btn-sm">
+                        <p class="mb-2">Sin suscripción activa.</p>
+                        <a href="/Suscripciones?cliente=<?= $cliente['id'] ?>" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-1"></i>Crear suscripción
                         </a>
                     </div>
@@ -221,7 +262,7 @@ body.dark-mode .info-row .label { color: #adb5bd; }
             <?php endif; ?>
         </div>
 
-        <!-- ── PLAN INICIAL (solo al crear) ── -->
+        <!-- PLAN INICIAL (solo al crear) -->
         <?php if (!$cliente): ?>
         <div class="col-lg-4">
             <div class="card shadow-sm h-100">
@@ -230,34 +271,26 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                 </div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">
-                        Opcional — puedes asignarlo después desde
-                        <strong>Suscripciones</strong>.
+                        Opcional — puedes asignarlo después desde <strong>Suscripciones</strong>.
                     </p>
-
                     <input type="hidden" name="plan_id" id="inputPlanId" value="">
-
-                    <!-- Cards visuales de plan -->
                     <div class="d-flex flex-column gap-2 mb-3">
                         <?php foreach ($planes as $plan):
                             $pNombre = strtolower($plan['nombre']);
                             $pClase  = str_contains($pNombre,'premium') ? 'plan-premium'
-                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar')
-                                ? 'plan-estandar' : 'plan-basico');
+                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar') ? 'plan-estandar' : 'plan-basico');
                             $pIcon   = str_contains($pNombre,'premium') ? 'fas fa-crown'
-                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar')
-                                ? 'fas fa-star' : 'fas fa-leaf');
+                                : (str_contains($pNombre,'estándar') || str_contains($pNombre,'estandar') ? 'fas fa-star' : 'fas fa-leaf');
                         ?>
                         <div class="plan-card <?= $pClase ?>"
-                             data-id="<?= $plan['id'] ?>"
-                             data-duracion="<?= $plan['duracion_dias'] ?>"
+                             data-id="<?= $plan['id'] ?>" data-duracion="<?= $plan['duracion_dias'] ?>"
                              onclick="seleccionarPlan(this)">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="<?= $pIcon ?>" style="font-size:1.4rem;"></i>
                                 <div class="text-start">
                                     <div class="fw-bold"><?= htmlspecialchars($plan['nombre']) ?></div>
                                     <div class="small text-muted">
-                                        $<?= number_format($plan['precio'],2) ?>/mes
-                                        · <?= $plan['duracion_dias'] ?> días
+                                        $<?= number_format($plan['precio'],2) ?>/mes · <?= $plan['duracion_dias'] ?> días
                                     </div>
                                 </div>
                                 <i class="fas fa-check-circle ms-auto d-none check-icon text-success"></i>
@@ -265,15 +298,12 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                         </div>
                         <?php endforeach; ?>
                     </div>
-
-                    <!-- Fechas (aparecen al seleccionar plan) -->
                     <div id="camposFecha" style="display:none;">
                         <hr>
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Fecha de inicio</label>
                             <input type="date" class="form-control form-control-sm"
-                                   name="fecha_inicio" id="fechaInicio"
-                                   value="<?= date('Y-m-d') ?>">
+                                   name="fecha_inicio" id="fechaInicio" value="<?= date('Y-m-d') ?>">
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Fecha de vencimiento</label>
@@ -282,22 +312,19 @@ body.dark-mode .info-row .label { color: #adb5bd; }
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Notas</label>
-                            <textarea class="form-control form-control-sm"
-                                      name="notas_suscripcion" rows="2"
-                                      placeholder="Observaciones..."></textarea>
+                            <textarea class="form-control form-control-sm" name="notas_suscripcion"
+                                      rows="2" placeholder="Observaciones..."></textarea>
                         </div>
-                        <button type="button" class="btn btn-link btn-sm text-muted p-0"
-                                onclick="limpiarPlan()">
+                        <button type="button" class="btn btn-link btn-sm text-muted p-0" onclick="limpiarPlan()">
                             <i class="fas fa-times me-1"></i>Quitar plan
                         </button>
                     </div>
-
                 </div>
             </div>
         </div>
         <?php endif; ?>
 
-    </div><!-- /row -->
+    </div>
 
     <div class="d-flex gap-2 justify-content-end mt-4">
         <a href="/Clientes" class="btn btn-outline-secondary">
@@ -308,30 +335,49 @@ body.dark-mode .info-row .label { color: #adb5bd; }
             <?= $cliente ? 'Guardar Cambios' : 'Registrar Cliente' ?>
         </button>
     </div>
-
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// ── Seleccionar plan ──
+// ── Preview logo en tiempo real ──
+function previsualizarLogo(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (file.size > 3 * 1024 * 1024) {
+        Swal.fire({ icon:'error', title:'Imagen muy grande',
+            text:'El logo no puede superar 3MB.', confirmButtonColor:'#005C3E' });
+        input.value = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById('logoPreview');
+        preview.innerHTML = `<img src="${e.target.result}" alt="logo" style="width:100%;height:100%;object-fit:cover;">`;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ── Actualiza iniciales al escribir nombre ──
+function actualizarIniciales(nombre) {
+    const ini = document.getElementById('logoIniciales');
+    if (!ini) return; // ya hay logo cargado
+    const p = nombre.trim().split(' ');
+    ini.textContent = (p[0][0] || '').toUpperCase() + (p[1] ? p[1][0].toUpperCase() : '');
+}
+
+// ── Plan ──
 function seleccionarPlan(el) {
-    // Quita selección anterior
     document.querySelectorAll('.plan-card').forEach(c => {
         c.classList.remove('selected');
         c.querySelector('.check-icon')?.classList.add('d-none');
     });
-
-    // Marca el seleccionado
     el.classList.add('selected');
     el.querySelector('.check-icon')?.classList.remove('d-none');
     document.getElementById('inputPlanId').value = el.dataset.id;
-
-    // Muestra campos de fecha
     document.getElementById('camposFecha').style.display = 'block';
     calcularVencimiento(el.dataset.duracion);
 }
 
-// ── Limpiar plan seleccionado ──
 function limpiarPlan() {
     document.querySelectorAll('.plan-card').forEach(c => {
         c.classList.remove('selected');
@@ -341,7 +387,6 @@ function limpiarPlan() {
     document.getElementById('camposFecha').style.display = 'none';
 }
 
-// ── Calcula fecha vencimiento ──
 function calcularVencimiento(duracion) {
     const fi = document.getElementById('fechaInicio');
     const fv = document.getElementById('fechaVencimiento');
@@ -352,36 +397,27 @@ function calcularVencimiento(duracion) {
 }
 
 const fi = document.getElementById('fechaInicio');
-if (fi) {
-    fi.addEventListener('change', function () {
-        const sel = document.querySelector('.plan-card.selected');
-        if (sel) calcularVencimiento(sel.dataset.duracion);
-    });
-}
+if (fi) fi.addEventListener('change', () => {
+    const sel = document.querySelector('.plan-card.selected');
+    if (sel) calcularVencimiento(sel.dataset.duracion);
+});
 
-// ── Validación submit ──
-document.getElementById('clienteForm').addEventListener('submit', function (e) {
+// ── Validación ──
+document.getElementById('clienteForm').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value.trim();
     const email  = document.getElementById('email').value.trim();
-
     if (!nombre) {
         e.preventDefault();
         Swal.fire({ icon:'error', title:'Campo requerido',
-            text:'El nombre del cliente es obligatorio.',
-            confirmButtonColor:'#005C3E'
-        }).then(() => document.getElementById('nombre').focus());
+            text:'El nombre del cliente es obligatorio.', confirmButtonColor:'#005C3E' });
         return;
     }
-
     if (!email) {
         e.preventDefault();
         Swal.fire({ icon:'error', title:'Campo requerido',
-            text:'El correo electrónico es obligatorio.',
-            confirmButtonColor:'#005C3E'
-        }).then(() => document.getElementById('email').focus());
+            text:'El correo es obligatorio.', confirmButtonColor:'#005C3E' });
         return;
     }
-
     const btn = document.getElementById('btnGuardar');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';

@@ -69,7 +69,7 @@
    MODO OSCURO
    ============================================ */
 
-.dark-mode {
+html.dark-mode {
     --bg-body: #0f1a15;
     --text-primary: #e0e0e0;
     --text-secondary: #adb5bd;
@@ -367,7 +367,7 @@ body {
 
 .card-metric { border-left: 4px solid var(--accent) !important; }
 .card-metric .metric-value { font-size: 2rem; font-weight: 700; color: var(--btn-primary-bg); }
-.dark-mode .card-metric .metric-value { color: var(--accent); }
+html.dark-mode .card-metric .metric-value { color: var(--accent); }
 
 /* ============================================
    BOTONES
@@ -507,7 +507,7 @@ body {
    directamente en el elemento .table para
    que apliquen a todas las celdas del sistema
    ─────────────────────────────────────────── */
-body.dark-mode .table {
+htmlhtml.dark-mode .table {
     /* Variables internas de Bootstrap 5 */
     --bs-table-color:        #e0e0e0;
     --bs-table-bg:           transparent;
@@ -522,7 +522,7 @@ body.dark-mode .table {
 }
 
 /* Todas las celdas en modo oscuro */
-body.dark-mode .table > :not(caption) > * > * {
+htmlhtml.dark-mode .table > :not(caption) > * > * {
     color: #e0e0e0 !important;
     background-color: transparent !important;
     border-bottom-color: #1e3329 !important;
@@ -531,42 +531,42 @@ body.dark-mode .table > :not(caption) > * > * {
 }
 
 /* Encabezado en modo oscuro */
-body.dark-mode .table thead > tr > * {
+htmlhtml.dark-mode .table thead > tr > * {
     color: #ffffff !important;
     background-color: #1a3329 !important;
     border-color: #1e3329 !important;
 }
 
 /* Texto dentro de celdas */
-body.dark-mode .table p,
-body.dark-mode .table p.mb-0,
-body.dark-mode .table span:not([class*="badge"]),
-body.dark-mode .table .fw-semibold,
-body.dark-mode .table .fw-bold { color: #ffffff !important; }
+htmlhtml.dark-mode .table p,
+htmlhtml.dark-mode .table p.mb-0,
+htmlhtml.dark-mode .table span:not([class*="badge"]),
+htmlhtml.dark-mode .table .fw-semibold,
+htmlhtml.dark-mode .table .fw-bold { color: #ffffff !important; }
 
-body.dark-mode .table small,
-body.dark-mode .table .text-muted { color: #adb5bd !important; }
+htmlhtml.dark-mode .table small,
+htmlhtml.dark-mode .table .text-muted { color: #adb5bd !important; }
 
 /* Hover modo oscuro */
-body.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
-body.dark-mode .table-hover > tbody > tr:hover > * {
+htmlhtml.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
+htmlhtml.dark-mode .table-hover > tbody > tr:hover > * {
     background-color: rgba(0, 230, 118, 0.09) !important;
     color: #e0e0e0 !important;
     --bs-table-bg-state: rgba(0, 230, 118, 0.09) !important;
 }
 
-body.dark-mode .table-hover > tbody > tr:hover small,
-body.dark-mode .table-hover > tbody > tr:hover .text-muted { color: #adb5bd !important; }
+htmlhtml.dark-mode .table-hover > tbody > tr:hover small,
+htmlhtml.dark-mode .table-hover > tbody > tr:hover .text-muted { color: #adb5bd !important; }
 
 /* Card footer en modo oscuro */
-body.dark-mode .card-footer {
+htmlhtml.dark-mode .card-footer {
     background: #111f18 !important;
     border-color: #1e3329 !important;
     color: #adb5bd !important;
 }
 
 /* Progress en modo oscuro */
-body.dark-mode .progress { background: #1e3329; }
+htmlhtml.dark-mode .progress { background: #1e3329; }
 
 /* ============================================
    ANIMACIONES
@@ -636,3 +636,153 @@ body.dark-mode .progress { background: #1e3329; }
     background-color: var(--accent);
     border-radius: 2px;
 }
+/* ============================================
+   PARCHE — custom-themes-fix.css
+   Agregar al final de custom-themes.css
+   ============================================ */
+
+/* ── Avatar con imagen (logo/foto) ─────────── */
+.avatar-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #005C3E, #00E676);
+    color: #fff; display: flex; align-items: center;
+    justify-content: center; font-weight: 700;
+    font-size: .8rem; flex-shrink: 0;
+    overflow: hidden; border: 2px solid var(--accent);
+}
+.avatar-circle img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 50%;
+}
+
+/* ── Fix dark mode tablas — texto invisible ─── */
+/* El CSS global ya cubre la mayoría.
+   Este parche cubre los casos que se escapan. */
+htmlhtml.dark-mode .table td,
+htmlhtml.dark-mode .table th {
+    color: #e0e0e0 !important;
+}
+htmlhtml.dark-mode .table td code {
+    color: #00E676 !important;
+    background: rgba(0,230,118,0.08);
+    padding: 2px 6px; border-radius: 4px;
+}
+htmlhtml.dark-mode .table .text-success { color: #00E676 !important; }
+htmlhtml.dark-mode .table .text-danger  { color: #ff6b6b !important; }
+htmlhtml.dark-mode .table .text-warning { color: #ffc107 !important; }
+htmlhtml.dark-mode .table .text-muted   { color: #adb5bd !important; }
+htmlhtml.dark-mode .table strong        { color: #ffffff !important; }
+
+/* Fix: badges dentro de tablas dark mode */
+htmlhtml.dark-mode .table .badge { opacity: 1 !important; }
+htmlhtml.dark-mode .table .badge-activa   { color: #005C3E !important; }
+htmlhtml.dark-mode .table .badge-vencida  { color: #dc3545 !important; }
+htmlhtml.dark-mode .table .badge-por-vencer { color: #b38600 !important; }
+htmlhtml.dark-mode .table .badge-suspendida { color: #6c757d !important; }
+
+/* ── Colores de fila plan dark mode ──────────── */
+htmlhtml.dark-mode tr.plan-basico   { background-color: rgba(108,117,125,0.08) !important; }
+htmlhtml.dark-mode tr.plan-estandar { background-color: rgba(13,110,253,0.08)  !important; }
+htmlhtml.dark-mode tr.plan-premium  { background-color: rgba(255,193,7,0.08)   !important; }
+
+/* ── Upload zona dark mode ───────────────────── */
+htmlhtml.dark-mode .upload-zona {
+    background: rgba(0,92,62,0.08);
+    border-color: #1e3329;
+}
+htmlhtml.dark-mode .upload-zona:hover {
+    background: rgba(0,230,118,0.1);
+    border-color: #00E676;
+}
+
+/* ── Barra de progreso dark mode ─────────────── */
+htmlhtml.dark-mode .barra-mini  { background: #1e3329; }
+htmlhtml.dark-mode .barra-saldo { background: #1e3329; }
+htmlhtml.dark-mode .barra-pago  { background: #1e3329; }
+
+/* ── Card plan dark mode ─────────────────────── */
+htmlhtml.dark-mode .plan-card-display .card-body { background: #111f18; }
+htmlhtml.dark-mode .plan-card-display .card-footer {
+    background: #0f1a15 !important;
+    border-color: #1e3329 !important;
+}
+
+/* ── Nav tabs dark mode ──────────────────────── */
+htmlhtml.dark-mode .nav-tabs {
+    border-color: #1e3329;
+}
+htmlhtml.dark-mode .nav-tabs .nav-link {
+    color: #adb5bd;
+    border-color: #1e3329;
+    background: transparent;
+}
+htmlhtml.dark-mode .nav-tabs .nav-link:hover {
+    color: #00E676;
+    border-color: #1e3329;
+}
+htmlhtml.dark-mode .nav-tabs .nav-link.active {
+    background: #111f18;
+    color: #00E676;
+    border-color: #1e3329 #1e3329 #111f18;
+}
+
+/* ── Tab content dark mode ───────────────────── */
+htmlhtml.dark-mode .tab-content { color: #e0e0e0; }
+
+/* ── Cuenta card dark mode ───────────────────── */
+htmlhtml.dark-mode .cuenta-card {
+    background: rgba(0,92,62,0.08);
+    border-color: #1e3329;
+}
+htmlhtml.dark-mode .cuenta-card:hover { border-color: #005C3E; }
+htmlhtml.dark-mode .cuenta-card.selected {
+    border-color: #00E676 !important;
+    background: rgba(0,230,118,0.1) !important;
+}
+
+/* ── Info cuenta panel dark mode ─────────────── */
+htmlhtml.dark-mode #infoCuenta > div {
+    background: rgba(255,193,7,0.06) !important;
+    border-color: #b38600 !important;
+}
+
+/* ── Tipo card dark mode ─────────────────────── */
+htmlhtml.dark-mode .tipo-card {
+    border-color: #1e3329;
+    color: #e0e0e0;
+}
+htmlhtml.dark-mode .tipo-card.selected {
+    border-color: #00E676 !important;
+    background: rgba(0,230,118,0.1) !important;
+}
+htmlhtml.dark-mode .tipo-cuenta-card {
+    border-color: #1e3329;
+    color: #e0e0e0;
+}
+htmlhtml.dark-mode .tipo-cuenta-card.selected {
+    border-color: #00E676 !important;
+    background: rgba(0,230,118,0.1) !important;
+}
+
+/* ── Resumen pago dark mode ──────────────────── */
+htmlhtml.dark-mode .resumen-pago {
+    background: rgba(0,230,118,0.06);
+    border-color: #00E676;
+}
+
+/* ── Form text dark mode ─────────────────────── */
+htmlhtml.dark-mode .form-text { color: #7ab89a !important; }
+htmlhtml.dark-mode label { color: #c8e6d5; }
+
+/* ── Alert dark mode ─────────────────────────── */
+htmlhtml.dark-mode .alert-success {
+    background: rgba(0,92,62,0.2);
+    border-color: #005C3E;
+    color: #00E676;
+}
+htmlhtml.dark-mode .alert-danger {
+    background: rgba(220,53,69,0.15);
+    border-color: #dc3545;
+    color: #ff6b6b;
+}
+

@@ -52,9 +52,8 @@ class ClientesController {
                 if ($id > 0) {
                     $this->model->actualizar($id, $datos);
 
-                    // Procesa logo si se subió uno nuevo
                     if (!empty($_FILES['logo']['name'])) {
-                        $this->procesarYGuardarLogo($id, $cliente['logo'] ?? null);
+                        $this->procesarYGuardarLogo($id, $cliente['logo'] ?? null, $datos['nombre']);
                     }
 
                     $this->auditar('CLIENTE_ACTUALIZADO', $id);
@@ -66,9 +65,8 @@ class ClientesController {
                         $this->crearSuscripcionInicial($nuevoId);
                     }
 
-                    // Procesa logo del cliente nuevo
                     if (!empty($_FILES['logo']['name'])) {
-                        $this->procesarYGuardarLogo($nuevoId, null);
+                        $this->procesarYGuardarLogo($nuevoId, null, $datos['nombre']);
                     }
 
                     $this->auditar('CLIENTE_CREADO', $nuevoId);
@@ -128,10 +126,10 @@ class ClientesController {
 
     // ============================================
     // procesarYGuardarLogo()
-    // Valida la imagen, guarda en disco
-    // y actualiza la BD con la ruta
+    // Nombre del archivo: slug del nombre del cliente
+    // Ej: "Zona Marcol" → zona-marcol_42.jpg
     // ============================================
-    private function procesarYGuardarLogo(int $clienteId, ?string $logoActual): void {
+    private function procesarYGuardarLogo(int $clienteId, ?string $logoActual, string $nombreCliente): void {
         $file = $_FILES['logo'];
 
         if ($file['error'] !== UPLOAD_ERR_OK) return;
@@ -150,8 +148,11 @@ class ClientesController {
             return;
         }
 
+        // Genera nombre legible: "Zona Marcol" → "zona-marcol_42.jpg"
         $ext    = $mime === 'image/png' ? 'png' : 'jpg';
-        $nombre = 'logo_' . $clienteId . '_' . uniqid() . '.' . $ext;
+        $slug   = strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $nombreCliente), '-'));
+        $slug   = substr($slug, 0, 40); // máximo 40 chars
+        $nombre = $slug . '_' . $clienteId . '.' . $ext;
         $dirAbs = ROOT . self::UPLOAD_DIR_LOGOS;
 
         if (!is_dir($dirAbs)) mkdir($dirAbs, 0755, true);
@@ -161,8 +162,8 @@ class ClientesController {
             return;
         }
 
-        // Elimina logo anterior si existe
-        if ($logoActual && file_exists(ROOT . $logoActual)) {
+        // Elimina logo anterior si existe y es diferente al nuevo
+        if ($logoActual && file_exists(ROOT . $logoActual) && $logoActual !== self::UPLOAD_DIR_LOGOS . $nombre) {
             unlink(ROOT . $logoActual);
         }
 
