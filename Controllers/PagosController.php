@@ -2,9 +2,10 @@
 namespace Controllers;
 
 use Models\PagosModel;
+use Controllers\Autorizable;
 
 class PagosController {
-
+use Autorizable;
     private $model;
     private const UPLOAD_DIR = 'Content/Uploads/comprobantes/';
     private const MAX_SIZE   = 5 * 1024 * 1024;
@@ -12,6 +13,8 @@ class PagosController {
 
     public function __construct() {
         $this->model = new PagosModel();
+        $this->requireLogin();
+        $this->requirePermiso('pagos', 'ver');
     }
 
     // ============================================

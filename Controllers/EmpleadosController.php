@@ -2,17 +2,15 @@
 namespace Controllers;
 
 use Models\EmpleadosModel;
+use Controllers\Autorizable;
 
 class EmpleadosController {
-
+use Autorizable;
     private $model;
 
     public function __construct() {
-        $this->model = new EmpleadosModel();
-        if (!($_SESSION['system']['EsAdmin'] ?? false)) {
-            header('Location: /Home');
-            exit();
-        }
+         $this->model = new EmpleadosModel();
+         $this->requireAdmin();
     }
 
     // ============================================

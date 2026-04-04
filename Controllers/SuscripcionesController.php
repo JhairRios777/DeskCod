@@ -2,13 +2,16 @@
 namespace Controllers;
 
 use Models\SuscripcionesModel;
+use Controllers\Autorizable;
 
 class SuscripcionesController {
-
+use Autorizable;
     private $model;
 
     public function __construct() {
         $this->model = new SuscripcionesModel();
+        $this->requireLogin();                      
+        $this->requirePermiso('suscripciones', 'ver');
     }
 
     // ============================================

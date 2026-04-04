@@ -2,13 +2,16 @@
 namespace Controllers;
 
 use Models\PlanesModel;
+use Controllers\Autorizable;
 
 class PlanesController {
-
+use Autorizable;
     private $model;
 
     public function __construct() {
         $this->model = new PlanesModel();
+        $this->requireLogin();
+        $this->requirePermiso('planes', 'ver');
     }
 
     // ============================================

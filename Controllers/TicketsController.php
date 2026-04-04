@@ -2,13 +2,17 @@
 namespace Controllers;
 
 use Models\TicketsModel;
+use Controllers\Autorizable;
 
 class TicketsController {
+    use Autorizable;
 
     private $model;
 
     public function __construct() {
         $this->model = new TicketsModel();
+        $this->requireLogin(); 
+        $this->requirePermiso('tickets', 'ver');
     }
 
         // ============================================

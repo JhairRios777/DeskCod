@@ -1,8 +1,5 @@
 <!-- Views/Clientes/index.php -->
-<?php
-echo extension_loaded('zip') ? "ZIP: OK\n" : "ZIP: NO\n";
-echo extension_loaded('gd')  ? "GD: OK\n"  : "GD: NO\n";
-?>
+
 <style>
 tr.plan-basico   td:first-child { border-left: 4px solid #6c757d !important; }
 tr.plan-estandar td:first-child { border-left: 4px solid #0d6efd !important; }

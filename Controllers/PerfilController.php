@@ -2,8 +2,10 @@
 namespace Controllers;
 
 use Config\Conexion;
+use Controllers\Autorizable;
 
 class PerfilController {
+    use Autorizable;
 
     private $db;
     private const UPLOAD_DIR = 'Content/Uploads/fotos/';
@@ -12,6 +14,8 @@ class PerfilController {
 
     public function __construct() {
         $this->db = (new Conexion())->getConexion();
+        $this->requireLogin();
+
     }
 
     public function index(): array {

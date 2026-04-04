@@ -2,9 +2,10 @@
 namespace Controllers;
 
 use Models\ClientesModel;
+use Controllers\Autorizable;
 
 class ClientesController {
-
+use Autorizable;
     private $model;
     private const UPLOAD_DIR_LOGOS = 'Content/Uploads/logos/';
     private const MAX_SIZE         = 3 * 1024 * 1024;
@@ -12,6 +13,8 @@ class ClientesController {
 
     public function __construct() {
         $this->model = new ClientesModel();
+        $this->requireLogin();
+        $this->requirePermiso('Clientes', 'ver');
     }
 
     public function index(): array {

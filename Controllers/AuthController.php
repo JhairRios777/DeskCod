@@ -114,7 +114,7 @@ class AuthController {
         $userId = $_SESSION['system']['UserID'] ?? null;
         if ($userId) $this->auditar('LOGOUT', $userId);
         session_destroy();
-        header('Location: /Auth/login');
+        header('Location: /login');
         exit();
     }
 

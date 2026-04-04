@@ -50,23 +50,69 @@ body.dark-mode .dias-16-30 { color:#00E676; }
         <small class="text-muted">Resumen general del sistema</small>
     </div>
     <!-- Filtros globales -->
-    <div class="d-flex gap-2 align-items-center">
-        <form method="GET" action="/Reportes" class="d-flex gap-2">
-            <select name="anio" class="form-select form-select-sm" style="width:90px;"
-                    onchange="this.form.submit()">
-                <?php for ($y = date('Y'); $y >= date('Y') - 3; $y--): ?>
-                <option value="<?= $y ?>" <?= $y === $anio ? 'selected' : '' ?>><?= $y ?></option>
-                <?php endfor; ?>
-            </select>
-            <select name="dias" class="form-select form-select-sm" style="width:130px;"
-                    onchange="this.form.submit()">
-                <option value="7"  <?= $dias===7  ? 'selected':'' ?>>Próx. 7 días</option>
-                <option value="15" <?= $dias===15 ? 'selected':'' ?>>Próx. 15 días</option>
-                <option value="30" <?= $dias===30 ? 'selected':'' ?>>Próx. 30 días</option>
-                <option value="60" <?= $dias===60 ? 'selected':'' ?>>Próx. 60 días</option>
-            </select>
-        </form>
+    <!-- PARCHE: reemplaza el bloque de filtros globales en Views/Reportes/index.php -->
+<!-- Busca:  <div class="d-flex gap-2 align-items-center"> -->
+<!-- Reemplaza todo ese bloque con este: -->
+
+<div class="d-flex gap-2 align-items-center flex-wrap">
+    <form method="GET" action="/Reportes" class="d-flex gap-2">
+        <select name="anio" class="form-select form-select-sm" style="width:90px;"
+                onchange="this.form.submit()">
+            <?php for ($y = date('Y'); $y >= date('Y') - 3; $y--): ?>
+            <option value="<?= $y ?>" <?= $y === $anio ? 'selected' : '' ?>><?= $y ?></option>
+            <?php endfor; ?>
+        </select>
+        <select name="dias" class="form-select form-select-sm" style="width:130px;"
+                onchange="this.form.submit()">
+            <option value="7"  <?= $dias===7  ? 'selected':'' ?>>Próx. 7 días</option>
+            <option value="15" <?= $dias===15 ? 'selected':'' ?>>Próx. 15 días</option>
+            <option value="30" <?= $dias===30 ? 'selected':'' ?>>Próx. 30 días</option>
+            <option value="60" <?= $dias===60 ? 'selected':'' ?>>Próx. 60 días</option>
+        </select>
+    </form>
+
+    <!-- Botones de exportación -->
+    <div class="btn-group btn-group-sm" id="btnsExportar">
+        <button class="btn btn-outline-danger" onclick="exportar('pdf')" title="Exportar PDF">
+            <i class="fas fa-file-pdf me-1"></i>PDF
+        </button>
+        <button class="btn btn-outline-success" onclick="exportar('excel')" title="Exportar Excel">
+            <i class="fas fa-file-excel me-1"></i>Excel
+        </button>
     </div>
+</div>
+
+<script>
+// Detecta el tab activo y exporta
+function exportar(tipo) {
+    const tabActivo = document.querySelector('#reportesTabs .nav-link.active');
+    let tab = 'ingresos';
+    if (tabActivo) {
+        const target = tabActivo.getAttribute('data-bs-target') || '';
+        const map = {
+            '#tabIngresos':      'ingresos',
+            '#tabSaldos':        'saldos',
+            '#tabSuscripciones': 'suscripciones',
+            '#tabTickets':       'tickets',
+            '#tabEmpleados':     'empleados',
+        };
+        tab = map[target] || 'ingresos';
+    }
+
+    const anio = <?= $anio ?>;
+    const dias  = <?= $dias ?>;
+    const accion = tipo === 'pdf' ? 'exportarPdf' : 'exportarExcel';
+    const url = `/Reportes/${accion}?tab=${tab}&anio=${anio}&dias=${dias}`;
+
+    if (tipo === 'pdf') {
+        // Abre en nueva ventana para imprimir/guardar como PDF
+        window.open(url, '_blank');
+    } else {
+        // Descarga directa del CSV
+        window.location.href = url;
+    }
+}
+</script>
 </div>
 
 <!-- Métricas rápidas -->
