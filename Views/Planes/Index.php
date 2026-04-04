@@ -5,31 +5,27 @@
 .table-hover > tbody > tr:hover > * {
     background-color: rgba(0,92,62,0.08) !important;
     --bs-table-bg-state: rgba(0,92,62,0.08) !important;
-    --bs-table-bg-type:  rgba(0,92,62,0.08) !important;
 }
-body.dark-mode .table {
+html.dark-mode .table {
     --bs-table-color: #e0e0e0 !important; --bs-table-bg: transparent !important;
     --bs-table-border-color: #1e3329 !important; color: #e0e0e0 !important;
 }
-body.dark-mode .table > :not(caption) > * > * {
+html.dark-mode .table > :not(caption) > * > * {
     background-color: transparent !important; color: #e0e0e0 !important;
     border-bottom-color: #1e3329 !important;
-    --bs-table-bg-state: transparent !important; --bs-table-bg-type: transparent !important;
 }
-body.dark-mode .table thead > tr > * {
+html.dark-mode .table thead > tr > * {
     background-color: #1a3329 !important; color: #fff !important; border-color: #1e3329 !important;
 }
-body.dark-mode .table p, body.dark-mode .table .fw-semibold { color: #fff !important; }
-body.dark-mode .table small, body.dark-mode .table .text-muted { color: #adb5bd !important; }
-body.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
-body.dark-mode .table-hover > tbody > tr:hover > * {
+html.dark-mode .table p, html.dark-mode .table .fw-semibold { color: #fff !important; }
+html.dark-mode .table small, html.dark-mode .table .text-muted { color: #adb5bd !important; }
+html.dark-mode .table-hover > tbody > tr:hover > :not(caption) > * > *,
+html.dark-mode .table-hover > tbody > tr:hover > * {
     background-color: rgba(0,230,118,0.12) !important; color: #e0e0e0 !important;
-    --bs-table-bg-state: rgba(0,230,118,0.12) !important;
-    --bs-table-bg-type:  rgba(0,230,118,0.12) !important;
 }
-body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3329 !important; }
+html.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3329 !important; }
 
-/* Cards de plan */
+/* Cards */
 .plan-card-display {
     border-radius: 16px; overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -41,6 +37,21 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
 .plan-card-display.plan-basico   .card-header { background: #6c757d !important; }
 .plan-card-display.plan-estandar .card-header { background: #0d6efd !important; }
 .plan-card-display.plan-premium  .card-header { background: linear-gradient(135deg,#b8860b,#ffc107) !important; }
+
+/* Badge descuento */
+.badge-descuento {
+    background: linear-gradient(135deg, #dc3545, #ff6b6b);
+    color: #fff; font-size: .7rem; padding: 3px 8px;
+    border-radius: 20px; font-weight: 700;
+}
+
+/* Precio anual */
+.precio-anual-box {
+    background: rgba(0,230,118,0.08);
+    border: 1px dashed rgba(0,230,118,0.4);
+    border-radius: 8px; padding: .5rem .75rem;
+    margin-top: .5rem;
+}
 </style>
 
 <!-- Header -->
@@ -75,9 +86,10 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
     <?php foreach ($planes as $p):
         $pN    = strtolower($p['nombre']);
         $clase = str_contains($pN,'premium') ? 'plan-premium'
-            : (str_contains($pN,'estándar') || str_contains($pN,'estandar') ? 'plan-estandar' : 'plan-basico');
+            : (str_contains($pN,'est') ? 'plan-estandar' : 'plan-basico');
         $icon  = str_contains($pN,'premium') ? 'fas fa-crown'
-            : (str_contains($pN,'estándar') || str_contains($pN,'estandar') ? 'fas fa-star' : 'fas fa-leaf');
+            : (str_contains($pN,'est') ? 'fas fa-star' : 'fas fa-leaf');
+        $tieneDescuento = (float)($p['descuento_anual'] ?? 0) > 0;
     ?>
     <div class="col-md-4">
         <div class="card shadow-sm plan-card-display <?= $clase ?>">
@@ -87,18 +99,43 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
                         <i class="<?= $icon ?> me-2 fa-lg"></i>
                         <span class="fw-bold fs-5"><?= htmlspecialchars($p['nombre']) ?></span>
                     </div>
-                    <span class="badge bg-white bg-opacity-25">
-                        <?= $p['total_suscripciones'] ?> activos
-                    </span>
+                    <div class="d-flex flex-column align-items-end gap-1">
+                        <span class="badge bg-white bg-opacity-25">
+                            <?= $p['total_suscripciones'] ?> activos
+                        </span>
+                        <?php if ($tieneDescuento): ?>
+                        <span class="badge-descuento">
+                            <?= number_format($p['descuento_anual'], 0) ?>% anual
+                        </span>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
-                <div class="text-center mb-3">
+                <!-- Precio mensual -->
+                <div class="text-center mb-2">
                     <span class="fs-2 fw-bold text-success">L.<?= number_format($p['precio'],2) ?></span>
                     <span class="text-muted">/mes</span>
                 </div>
+
+                <!-- Precio anual si tiene descuento -->
+                <?php if ($tieneDescuento): ?>
+                <div class="precio-anual-box text-center mb-2">
+                    <div class="small text-muted mb-1">
+                        <i class="fas fa-calendar-alt me-1"></i>Precio anual
+                    </div>
+                    <span class="fw-bold text-success">
+                        L.<?= number_format($p['precio_anual'], 2) ?>
+                    </span>
+                    <span class="text-muted small">/año</span>
+                    <div class="text-success small">
+                        Ahorro: L.<?= number_format($p['ahorro_anual'], 2) ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <p class="text-muted small text-center mb-3">
-                    <?= htmlspecialchars($p['descripcion'] ?? '') ?>
+                    <?= htmlspecialchars(substr($p['descripcion'] ?? '',0,80)) ?>
                 </p>
                 <hr>
                 <div class="d-flex justify-content-between small">
@@ -107,7 +144,7 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
                     </span>
                     <span class="text-muted">
                         <i class="fas fa-ticket-alt me-1"></i>
-                        <?= $p['max_tickets'] ? $p['max_tickets'].' tickets/mes' : 'Tickets ilimitados' ?>
+                        <?= $p['max_tickets'] ? $p['max_tickets'].' tickets/mes' : 'Ilimitados' ?>
                     </span>
                 </div>
             </div>
@@ -139,34 +176,50 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
                 <thead>
                     <tr>
                         <th>Plan</th>
-                        <th>Precio</th>
+                        <th>Precio/mes</th>
+                        <th>Descuento anual</th>
+                        <th>Precio/año</th>
+                        <th>Ahorro</th>
                         <th>Duración</th>
                         <th>Max Tickets</th>
-                        <th>Suscripciones activas</th>
-                        <th>Estado</th>
+                        <th>Activos</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($planes as $p): ?>
+                    <?php foreach ($planes as $p):
+                        $tieneDescuento = (float)($p['descuento_anual'] ?? 0) > 0;
+                    ?>
                     <tr>
                         <td>
                             <p class="mb-0 fw-semibold"><?= htmlspecialchars($p['nombre']) ?></p>
-                            <small class="text-muted"><?= htmlspecialchars(substr($p['descripcion'] ?? '',0,50)) ?>...</small>
+                            <small class="text-muted"><?= htmlspecialchars(substr($p['descripcion'] ?? '',0,40)) ?>...</small>
                         </td>
                         <td><strong class="text-success">L.<?= number_format($p['precio'],2) ?></strong></td>
-                        <td><?= $p['duracion_dias'] ?> días</td>
-                        <td><?= $p['max_tickets'] ?? '<span class="text-muted">Ilimitado</span>' ?></td>
                         <td>
-                            <span class="badge bg-primary"><?= $p['total_suscripciones'] ?></span>
-                        </td>
-                        <td>
-                            <?php if ($p['activo']): ?>
-                                <span class="badge-activa"><span class="status-active-pulse me-1"></span>Activo</span>
+                            <?php if ($tieneDescuento): ?>
+                            <span class="badge-descuento"><?= number_format($p['descuento_anual'],0) ?>% OFF</span>
                             <?php else: ?>
-                                <span class="badge-vencida">Inactivo</span>
+                            <span class="text-muted small">Sin descuento</span>
                             <?php endif; ?>
                         </td>
+                        <td>
+                            <?php if ($tieneDescuento): ?>
+                            <strong class="text-success">L.<?= number_format($p['precio_anual'],2) ?></strong>
+                            <?php else: ?>
+                            <span class="text-muted">L.<?= number_format($p['precio'] * 12, 2) ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($tieneDescuento): ?>
+                            <span class="text-success small">L.<?= number_format($p['ahorro_anual'],2) ?></span>
+                            <?php else: ?>
+                            <span class="text-muted">—</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= $p['duracion_dias'] ?> días</td>
+                        <td><?= $p['max_tickets'] ?? '<span class="text-muted">Ilimitado</span>' ?></td>
+                        <td><span class="badge bg-primary"><?= $p['total_suscripciones'] ?></span></td>
                         <td class="text-center">
                             <a href="/Planes/Registry/<?= $p['id'] ?>"
                                class="btn btn-sm btn-outline-warning me-1" title="Editar">
@@ -191,8 +244,7 @@ body.dark-mode .card-footer { background: #111f18 !important; border-color: #1e3
 function desactivar(id, nombre) {
     Swal.fire({
         title: '¿Desactivar plan?',
-        html: `El plan <strong>${nombre}</strong> no estará disponible para nuevas suscripciones.<br>
-               <small class="text-muted">Las suscripciones activas no se verán afectadas.</small>`,
+        html: `El plan <strong>${nombre}</strong> no estará disponible para nuevas suscripciones.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#005C3E',

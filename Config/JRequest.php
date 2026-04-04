@@ -13,6 +13,8 @@ class JRequest {
     private $Argument;
 
     public function __construct() {
+        error_log("[JRequest] GET url=" . ($_GET['url'] ?? 'NO EXISTE'));
+    error_log("[JRequest] REQUEST_URI=" . $_SERVER['REQUEST_URI']);
         if (isset($_GET["url"])) {
 
             // Sanitiza la URL eliminando caracteres peligrosos

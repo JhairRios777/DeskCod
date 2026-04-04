@@ -23,7 +23,7 @@ class JRouter {
         $controllerName .= "Controller";
         $method          = $request->getMethod();
         $argument        = $request->getArgument();
-
+error_log("[JRouter] controller=$controllerName method=$method argument=" . json_encode($argument));
         $method = preg_replace('/[^a-zA-Z0-9_-]/', '', $method);
         if (empty($method)) {
             $method = "index";
@@ -61,8 +61,12 @@ class JRouter {
         $viewPath = isset(self::$viewMap[$mapKey])
             ? ROOT . "Views" . DS . str_replace('/', DS, self::$viewMap[$mapKey])
             : ROOT . "Views" . DS . $request->getController() . DS . $method . ".php";
-
+error_log("[JRouter] viewPath: " . $viewPath);
+error_log("[JRouter] mapKey: " . $mapKey);
+error_log("[JRouter] method: " . $method);
         if (is_readable($viewPath)) {
+            // DEBUG TEMPORAL
+
             require $viewPath;
         }
     }

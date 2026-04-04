@@ -5,7 +5,8 @@ use Models\PlanesModel;
 use Controllers\Autorizable;
 
 class PlanesController {
-use Autorizable;
+    use Autorizable;
+
     private $model;
 
     public function __construct() {
@@ -14,9 +15,6 @@ use Autorizable;
         $this->requirePermiso('planes', 'ver');
     }
 
-    // ============================================
-    // GET /Planes — lista de planes
-    // ============================================
     public function index(): array {
         $planes        = $this->model->obtenerTodos();
         $flash_success = $_SESSION['flash_success'] ?? null;
@@ -25,11 +23,6 @@ use Autorizable;
         return compact('planes', 'flash_success', 'flash_error');
     }
 
-    // ============================================
-    // GET  /Planes/Registry   → crear
-    // GET  /Planes/Registry/1 → editar
-    // POST → guardar
-    // ============================================
     public function Registry(int $id = 0): array {
         $plan = null;
 
@@ -82,9 +75,6 @@ use Autorizable;
         return compact('plan', 'error', 'success');
     }
 
-    // ============================================
-    // POST /Planes/desactivar — JSON
-    // ============================================
     public function desactivar(): void {
         while (ob_get_level() > 0) ob_end_clean();
         header('Content-Type: application/json');
@@ -109,23 +99,24 @@ use Autorizable;
         exit();
     }
 
-    // ── Helpers ───────────────────────────────
-
     private function sanitizar(): array {
         return [
-            'nombre'        => trim(htmlspecialchars($_POST['nombre']      ?? '')),
-            'descripcion'   => trim($_POST['descripcion']                  ?? ''),
-            'precio'        => (float)str_replace(',', '.', $_POST['precio'] ?? 0),
-            'duracion_dias' => (int)($_POST['duracion_dias']               ?? 30),
-            'max_tickets'   => $_POST['max_tickets'] !== '' ? (int)$_POST['max_tickets'] : null,
+            'nombre'          => trim(htmlspecialchars($_POST['nombre']      ?? '')),
+            'descripcion'     => trim($_POST['descripcion']                  ?? ''),
+            'precio'          => (float)str_replace(',', '.', $_POST['precio'] ?? 0),
+            'duracion_dias'   => (int)($_POST['duracion_dias']               ?? 30),
+            'max_tickets'     => ($_POST['max_tickets'] ?? '') !== '' ? (int)$_POST['max_tickets'] : null,
+            'descuento_anual' => (float)str_replace(',', '.', $_POST['descuento_anual'] ?? 0),
         ];
     }
 
     private function validar(array $d): array {
         $e = [];
-        if (empty($d['nombre']))        $e[] = 'El nombre es obligatorio.';
-        if ($d['precio'] <= 0)          $e[] = 'El precio debe ser mayor a 0.';
-        if ($d['duracion_dias'] <= 0)   $e[] = 'La duración debe ser mayor a 0.';
+        if (empty($d['nombre']))               $e[] = 'El nombre es obligatorio.';
+        if ($d['precio'] <= 0)                 $e[] = 'El precio debe ser mayor a 0.';
+        if ($d['duracion_dias'] <= 0)          $e[] = 'La duración debe ser mayor a 0.';
+        if ($d['descuento_anual'] < 0 || $d['descuento_anual'] > 100)
+                                               $e[] = 'El descuento debe estar entre 0 y 100.';
         return $e;
     }
 
@@ -135,9 +126,7 @@ use Autorizable;
             $db->prepare("INSERT INTO auditoria_acciones (empleado_id,accion,tabla,registro_id,ip) VALUES (?,?,?,?,?)")
                ->execute([
                    $_SESSION['system']['UserID'] ?? 1,
-                   $accion,
-                   'planes',
-                   $registroId,
+                   $accion, 'planes', $registroId,
                    $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'
                ]);
         } catch (\PDOException $e) {

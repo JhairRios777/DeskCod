@@ -28,13 +28,14 @@ class PlanesModel {
     }
 
     public function crear(array $datos): int {
-        $stmt = $this->db->prepare("CALL sp_planes_crear(?,?,?,?,?)");
+        $stmt = $this->db->prepare("CALL sp_planes_crear(?,?,?,?,?,?)");
         $stmt->execute([
             $datos['nombre'],
             $datos['descripcion'],
             $datos['precio'],
             $datos['duracion_dias'],
             $datos['max_tickets'] ?: null,
+            $datos['descuento_anual'] ?? 0,
         ]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
@@ -42,7 +43,7 @@ class PlanesModel {
     }
 
     public function actualizar(int $id, array $datos): void {
-        $stmt = $this->db->prepare("CALL sp_planes_actualizar(?,?,?,?,?,?)");
+        $stmt = $this->db->prepare("CALL sp_planes_actualizar(?,?,?,?,?,?,?)");
         $stmt->execute([
             $id,
             $datos['nombre'],
@@ -50,6 +51,7 @@ class PlanesModel {
             $datos['precio'],
             $datos['duracion_dias'],
             $datos['max_tickets'] ?: null,
+            $datos['descuento_anual'] ?? 0,
         ]);
         $stmt->closeCursor();
     }
