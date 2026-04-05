@@ -65,13 +65,14 @@ class ClientesModel {
     }
 
     public function obtenerPlanes(): array {
-        $stmt = $this->db->query("
-            SELECT id, nombre, precio, duracion_dias
-            FROM planes WHERE activo = 1
-            ORDER BY precio ASC
-        ");
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->db->query("
+        SELECT id, nombre, precio, duracion_dias, descuento_anual,
+               ROUND(precio * 12 * (1 - descuento_anual / 100), 2) AS precio_anual,
+               ROUND(precio * 12 * (descuento_anual / 100), 2) AS ahorro_anual
+        FROM planes WHERE activo = 1 ORDER BY precio ASC
+    ");
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
 
     // ── API Token ─────────────────────────────
 

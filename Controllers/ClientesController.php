@@ -216,28 +216,51 @@ class ClientesController {
     }
 
     private function crearSuscripcionInicial(int $clienteId): void {
+    $planId      = (int)$_POST['plan_id'];
+    $tipoPeriodo = trim($_POST['tipo_periodo'] ?? 'mensual');
+    $fechaInicio = trim($_POST['fecha_inicio'] ?? date('Y-m-d'));
+
+    // Calcula la fecha de vencimiento en backend según el período
+    try {
         $db   = (new \Config\Conexion())->getConexion();
+        $stmt = $db->prepare("SELECT duracion_dias FROM planes WHERE id = ? LIMIT 1");
+        $stmt->execute([$planId]);
+        $plan = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        $inicio = new \DateTime($fechaInicio);
+        if ($tipoPeriodo === 'anual') {
+            $inicio->modify('+365 days');
+        } else {
+            $inicio->modify('+' . (int)($plan['duracion_dias'] ?? 30) . ' days');
+        }
+        $fechaVencimiento = $inicio->format('Y-m-d');
+
         $stmt = $db->prepare("CALL sp_suscripciones_crear(?,?,?,?,?)");
         $stmt->execute([
             $clienteId,
-            (int)$_POST['plan_id'],
-            $_POST['fecha_inicio'],
-            $_POST['fecha_vencimiento'],
+            $planId,
+            $fechaInicio,
+            $fechaVencimiento,
             trim($_POST['notas_suscripcion'] ?? ''),
         ]);
         $stmt->closeCursor();
+
+    } catch (\PDOException $e) {
+        error_log("[DeskCod] crearSuscripcionInicial: " . $e->getMessage());
     }
+}
 
     private function sanitizar(): array {
-        return [
-            'nombre'         => trim(htmlspecialchars($_POST['nombre']         ?? '')),
-            'email'          => trim(strtolower($_POST['email']                ?? '')),
-            'telefono'       => trim($_POST['telefono']                        ?? ''),
-            'empresa_nombre' => trim(htmlspecialchars($_POST['empresa_nombre'] ?? '')),
-            'nit_ruc'        => trim($_POST['nit_ruc']                         ?? ''),
-            'direccion'      => trim(htmlspecialchars($_POST['direccion']      ?? '')),
-        ];
-    }
+    return [
+        'nombre'         => trim(htmlspecialchars($_POST['nombre']         ?? '')),
+        'email'          => trim(strtolower($_POST['email']                ?? '')),
+        'telefono'       => trim($_POST['telefono']                        ?? ''),
+        'empresa_nombre' => trim(htmlspecialchars($_POST['empresa_nombre'] ?? '')),
+        'nit_ruc'        => trim($_POST['nit_ruc']                         ?? ''),
+        'direccion'      => trim(htmlspecialchars($_POST['direccion']      ?? '')),
+        'tipo_periodo'   => trim($_POST['tipo_periodo'] ?? 'mensual'),
+    ];
+}
 
     private function validar(array $d): array {
         $e = [];

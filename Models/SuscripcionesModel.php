@@ -15,20 +15,13 @@ class SuscripcionesModel {
     public function obtenerTodas(): array {
         $stmt = $this->db->query("
             SELECT
-                s.id,
-                s.estado,
-                s.fecha_inicio,
-                s.fecha_vencimiento,
-                s.renovacion_plan_id,
-                s.created_at,
-                c.id            AS cliente_id,
-                c.nombre        AS cliente_nombre,
-                c.email         AS cliente_email,
-                c.empresa_nombre,
-                p.id            AS plan_id,
-                p.nombre        AS plan_nombre,
-                p.precio        AS plan_precio,
-                pr.nombre       AS renovacion_plan_nombre
+                s.id, s.estado, s.fecha_inicio, s.fecha_vencimiento,
+                s.renovacion_plan_id, s.created_at,
+                c.id AS cliente_id, c.nombre AS cliente_nombre,
+                c.email AS cliente_email, c.empresa_nombre,
+                p.id AS plan_id, p.nombre AS plan_nombre,
+                p.precio AS plan_precio, p.descuento_anual,
+                pr.nombre AS renovacion_plan_nombre
             FROM suscripciones s
             INNER JOIN clientes c  ON c.id  = s.cliente_id
             INNER JOIN planes   p  ON p.id  = s.plan_id
@@ -43,20 +36,15 @@ class SuscripcionesModel {
 
     public function obtenerPorId(int $id): ?array {
         $stmt = $this->db->prepare("
-            SELECT
-                s.*,
-                c.nombre        AS cliente_nombre,
-                c.email         AS cliente_email,
-                c.empresa_nombre,
-                p.nombre        AS plan_nombre,
-                p.precio        AS plan_precio,
-                pr.nombre       AS renovacion_plan_nombre
+            SELECT s.*, c.nombre AS cliente_nombre, c.email AS cliente_email,
+                   c.empresa_nombre, p.nombre AS plan_nombre,
+                   p.precio AS plan_precio, p.descuento_anual,
+                   pr.nombre AS renovacion_plan_nombre
             FROM suscripciones s
             INNER JOIN clientes c  ON c.id  = s.cliente_id
             INNER JOIN planes   p  ON p.id  = s.plan_id
             LEFT  JOIN planes   pr ON pr.id = s.renovacion_plan_id
-            WHERE s.id = ?
-            LIMIT 1
+            WHERE s.id = ? LIMIT 1
         ");
         $stmt->execute([$id]);
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -65,9 +53,8 @@ class SuscripcionesModel {
     }
 
     public function obtenerPorCliente(int $clienteId): array {
-        $stmt = $this->db->prepare("CALL sp_suscripciones_por_cliente(:cid)");
-        $stmt->bindParam(':cid', $clienteId, \PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt = $this->db->prepare("CALL sp_suscripciones_por_cliente(?)");
+        $stmt->execute([$clienteId]);
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         $stmt->closeCursor();
         return $rows;
@@ -108,19 +95,18 @@ class SuscripcionesModel {
     public function obtenerClientes(): array {
         $stmt = $this->db->query("
             SELECT id, nombre, email, empresa_nombre
-            FROM clientes
-            WHERE activo = 1
-            ORDER BY nombre ASC
+            FROM clientes WHERE activo = 1 ORDER BY nombre ASC
         ");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    // Incluye descuento_anual para calcular precio anual en la vista
     public function obtenerPlanes(): array {
         $stmt = $this->db->query("
-            SELECT id, nombre, precio, duracion_dias
-            FROM planes
-            WHERE activo = 1
-            ORDER BY precio ASC
+            SELECT id, nombre, precio, duracion_dias, descuento_anual,
+                   ROUND(precio * 12 * (1 - descuento_anual / 100), 2) AS precio_anual,
+                   ROUND(precio * 12 * (descuento_anual / 100), 2) AS ahorro_anual
+            FROM planes WHERE activo = 1 ORDER BY precio ASC
         ");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }

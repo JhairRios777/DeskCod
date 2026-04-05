@@ -2,18 +2,19 @@
 
 <style>
 .input-group-text { background:#005C3E; color:#fff; border-color:#005C3E; }
-body.dark-mode .input-group-text { background:#1a3329; border-color:#1e3329; color:#e0e0e0; }
-body.dark-mode .form-control, body.dark-mode .form-select {
+html.dark-mode .input-group-text { background:#1a3329; border-color:#1e3329; color:#e0e0e0; }
+html.dark-mode .form-control, html.dark-mode .form-select {
     background:#111f18; border-color:#1e3329; color:#e0e0e0;
 }
-body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+html.dark-mode .form-control:focus, html.dark-mode .form-select:focus {
     background:#0f1a15; border-color:#00E676; box-shadow:0 0 0 3px rgba(0,230,118,0.1);
 }
-body.dark-mode .form-label { color:#c8e6d5; }
+html.dark-mode .form-label { color:#c8e6d5; }
 
+/* Plan cards */
 .plan-card {
-    border-radius:12px; padding:1rem; cursor:pointer;
-    transition:all 0.2s; border:2px solid transparent; text-align:center;
+    border-radius:12px; padding:.85rem 1rem; cursor:pointer;
+    transition:all 0.2s; border:2px solid transparent;
 }
 .plan-card:hover { transform:translateY(-2px); }
 .plan-card.plan-basico   { background:rgba(108,117,125,0.1); border-color:#6c757d; }
@@ -22,9 +23,42 @@ body.dark-mode .form-label { color:#c8e6d5; }
 .plan-card.selected.plan-basico   { background:rgba(108,117,125,0.25); box-shadow:0 4px 15px rgba(108,117,125,0.3); }
 .plan-card.selected.plan-estandar { background:rgba(13,110,253,0.2);   box-shadow:0 4px 15px rgba(13,110,253,0.3); }
 .plan-card.selected.plan-premium  { background:rgba(255,193,7,0.25);   box-shadow:0 4px 15px rgba(255,193,7,0.3); }
-body.dark-mode .plan-card.plan-basico   { background:rgba(108,117,125,0.15); }
-body.dark-mode .plan-card.plan-estandar { background:rgba(13,110,253,0.15); }
-body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
+html.dark-mode .plan-card.plan-basico   { background:rgba(108,117,125,0.15); }
+html.dark-mode .plan-card.plan-estandar { background:rgba(13,110,253,0.15); }
+html.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
+
+/* Toggle mensual/anual */
+.periodo-toggle {
+    display:flex; border-radius:8px; overflow:hidden;
+    border:2px solid #005C3E; width:100%;
+}
+.periodo-btn {
+    flex:1; padding:.5rem .75rem; text-align:center;
+    cursor:pointer; font-weight:600; font-size:.8rem;
+    transition:all 0.2s; border:none; background:transparent; color:#005C3E;
+}
+.periodo-btn.activo { background:#005C3E; color:#fff; }
+html.dark-mode .periodo-toggle { border-color:#00E676; }
+html.dark-mode .periodo-btn { color:#00E676; }
+html.dark-mode .periodo-btn.activo { background:#005C3E; color:#fff; }
+
+/* Badge descuento */
+.badge-off {
+    background:linear-gradient(135deg,#dc3545,#ff6b6b);
+    color:#fff; font-size:.65rem; padding:2px 6px;
+    border-radius:20px; font-weight:700; vertical-align:middle;
+}
+
+/* Resumen precio */
+.precio-resumen {
+    background:rgba(0,92,62,0.06);
+    border:1px solid rgba(0,92,62,0.2);
+    border-radius:8px; padding:.75rem;
+}
+html.dark-mode .precio-resumen {
+    background:rgba(0,230,118,0.05);
+    border-color:rgba(0,230,118,0.15);
+}
 
 /* Logo upload */
 .logo-wrap { position:relative; display:inline-block; }
@@ -45,8 +79,7 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
 }
 .logo-edit-btn:hover { background:#00895a; }
 
-/* Token API */
-.token-field { font-family: 'Courier New', monospace; font-size:.8rem; letter-spacing:.03em; }
+.token-field { font-family:'Courier New',monospace; font-size:.8rem; letter-spacing:.03em; }
 .bg-accent { background-color:#00E676 !important; }
 </style>
 
@@ -80,6 +113,7 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
 <form id="clienteForm" action="" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="Registrar" value="1">
     <input type="hidden" name="id" value="<?= $cliente['id'] ?? '' ?>">
+    <input type="hidden" name="tipo_periodo" id="tipoPeriodo" value="mensual">
 
     <div class="row g-4">
 
@@ -99,7 +133,7 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
                                 <?php
                                 $p         = explode(' ', $cliente['nombre'] ?? 'C');
                                 $ini       = strtoupper(substr($p[0],0,1).(isset($p[1])?substr($p[1],0,1):''));
-                                $tienelogo = !empty($cliente['logo']) && file_exists(ROOT . ($cliente['logo'] ?? ''));
+                                $tienelogo = !empty($cliente['logo']) && file_exists(ROOT.($cliente['logo']??''));
                                 ?>
                                 <div class="logo-wrap">
                                     <div class="logo-preview-circle" id="logoPreview"
@@ -221,7 +255,7 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
                             <div class="p-3 rounded" style="background:<?= $bgActual ?>;border:2px solid <?= $borderActual ?>;">
                                 <p class="text-muted small mb-1">Plan activo</p>
                                 <h5 class="fw-bold mb-1"><?= htmlspecialchars($cliente['plan_nombre']) ?></h5>
-                                <span class="badge bg-success">$<?= number_format($cliente['plan_precio'],2) ?>/mes</span>
+                                <span class="badge bg-success">L.<?= number_format($cliente['plan_precio'],2) ?>/mes</span>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -254,7 +288,7 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
                 </div>
             </div>
 
-            <!-- TOKEN API (solo al editar) -->
+            <!-- TOKEN API -->
             <div class="card shadow-sm mt-3">
                 <div class="card-header bg-primary d-flex align-items-center justify-content-between">
                     <span><i class="fas fa-key me-2"></i>Token de API</span>
@@ -263,42 +297,32 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
                 <div class="card-body">
                     <p class="text-muted small mb-3">
                         Este token identifica al sistema del cliente ante la API de DeskCod.
-                        Compártelo de forma segura — no lo expongas públicamente.
+                        Compártelo de forma segura.
                     </p>
-
                     <?php if ($apiToken): ?>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        <input type="text"
-                               class="form-control token-field"
-                               id="apiTokenInput"
-                               value="<?= htmlspecialchars($apiToken) ?>"
-                               readonly>
-                        <button type="button"
-                                class="btn btn-outline-secondary"
-                                onclick="copiarToken()"
-                                title="Copiar token">
+                        <input type="text" class="form-control token-field" id="apiTokenInput"
+                               value="<?= htmlspecialchars($apiToken) ?>" readonly>
+                        <button type="button" class="btn btn-outline-secondary"
+                                onclick="copiarToken()" title="Copiar">
                             <i class="fas fa-copy" id="iconCopiar"></i>
                         </button>
-                        <button type="button"
-                                class="btn btn-outline-warning"
-                                onclick="confirmarRegenerar(<?= $cliente['id'] ?>)"
-                                title="Regenerar token">
+                        <button type="button" class="btn btn-outline-warning"
+                                onclick="confirmarRegenerar(<?= $cliente['id'] ?>)" title="Regenerar">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                     <small class="text-muted mt-2 d-block">
                         <i class="fas fa-info-circle me-1"></i>
-                        Header a usar: <code>Authorization: Bearer <?= substr($apiToken, 0, 8) ?>...</code>
+                        Header: <code>Authorization: Bearer <?= substr($apiToken,0,8) ?>...</code>
                     </small>
                     <?php else: ?>
                     <div class="d-flex align-items-center gap-3">
                         <div class="text-muted small">
-                            <i class="fas fa-exclamation-circle me-1"></i>
-                            Este cliente no tiene token generado aún.
+                            <i class="fas fa-exclamation-circle me-1"></i>Sin token generado.
                         </div>
-                        <button type="button"
-                                class="btn btn-primary btn-sm"
+                        <button type="button" class="btn btn-primary btn-sm"
                                 onclick="generarTokenNuevo(<?= $cliente['id'] ?>)">
                             <i class="fas fa-plus me-1"></i>Generar token
                         </button>
@@ -313,51 +337,101 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
         <?php if (!$cliente): ?>
         <div class="col-lg-4">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary">
+                <div class="card-header" style="background:#005C3E;color:#fff;">
                     <i class="fas fa-sync-alt me-2"></i>Plan Inicial
                 </div>
-                <div class="card-body">
-                    <p class="text-muted small mb-3">
+                <div class="card-body d-flex flex-column gap-3">
+
+                    <p class="text-muted small mb-0">
                         Opcional — puedes asignarlo después desde <strong>Suscripciones</strong>.
                     </p>
+
+                    <!-- Toggle mensual/anual -->
+                    <div id="bloqueToggle" style="display:none;">
+                        <label class="form-label fw-semibold small mb-1">Tipo de período</label>
+                        <div class="periodo-toggle">
+                            <button type="button" class="periodo-btn activo" id="btnMensual"
+                                    onclick="seleccionarPeriodo('mensual')">
+                                <i class="fas fa-calendar me-1"></i>Mensual
+                            </button>
+                            <button type="button" class="periodo-btn" id="btnAnual"
+                                    onclick="seleccionarPeriodo('anual')">
+                                <i class="fas fa-calendar-alt me-1"></i>Anual
+                                <span class="badge-off ms-1 d-none" id="badgeDescuento"></span>
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1 d-block" id="textoDescuento"></small>
+                    </div>
+
+                    <!-- Cards de planes -->
                     <input type="hidden" name="plan_id" id="inputPlanId" value="">
-                    <div class="d-flex flex-column gap-2 mb-3">
+                    <div class="d-flex flex-column gap-2">
                         <?php foreach ($planes as $plan):
-                            $pNombre = strtolower($plan['nombre']);
-                            $pClase  = str_contains($pNombre,'premium') ? 'plan-premium'
-                                : (str_contains($pNombre,'est') ? 'plan-estandar' : 'plan-basico');
-                            $pIcon   = str_contains($pNombre,'premium') ? 'fas fa-crown'
-                                : (str_contains($pNombre,'est') ? 'fas fa-star' : 'fas fa-leaf');
+                            $pN   = strtolower($plan['nombre']);
+                            $pCls = str_contains($pN,'premium') ? 'plan-premium'
+                                : (str_contains($pN,'est') ? 'plan-estandar' : 'plan-basico');
+                            $pIcon = str_contains($pN,'premium') ? 'fas fa-crown'
+                                : (str_contains($pN,'est') ? 'fas fa-star' : 'fas fa-leaf');
+                            $tieneDescuento = (float)$plan['descuento_anual'] > 0;
                         ?>
-                        <div class="plan-card <?= $pClase ?>"
+                        <div class="plan-card <?= $pCls ?>"
                              data-id="<?= $plan['id'] ?>"
                              data-duracion="<?= $plan['duracion_dias'] ?>"
+                             data-precio="<?= $plan['precio'] ?>"
+                             data-precio-anual="<?= $plan['precio_anual'] ?>"
+                             data-ahorro="<?= $plan['ahorro_anual'] ?>"
+                             data-descuento="<?= $plan['descuento_anual'] ?>"
+                             data-nombre="<?= htmlspecialchars($plan['nombre'], ENT_QUOTES) ?>"
                              onclick="seleccionarPlan(this)">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="<?= $pIcon ?>" style="font-size:1.4rem;"></i>
-                                <div class="text-start">
-                                    <div class="fw-bold"><?= htmlspecialchars($plan['nombre']) ?></div>
-                                    <div class="small text-muted">
-                                        $<?= number_format($plan['precio'],2) ?>/mes · <?= $plan['duracion_dias'] ?> días
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="<?= $pIcon ?>" style="font-size:1.2rem;"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small"><?= htmlspecialchars($plan['nombre']) ?></div>
+                                    <div class="precio-mensual-display" style="font-size:.75rem;" class="text-muted">
+                                        L.<?= number_format($plan['precio'],2) ?>/mes
                                     </div>
+                                    <?php if ($tieneDescuento): ?>
+                                    <div class="precio-anual-display" style="font-size:.75rem;display:none;">
+                                        L.<?= number_format($plan['precio_anual'],2) ?>/año
+                                        <span class="badge-off"><?= number_format($plan['descuento_anual'],0) ?>% OFF</span>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
-                                <i class="fas fa-check-circle ms-auto d-none check-icon text-success"></i>
+                                <i class="fas fa-check-circle text-success d-none check-icon"></i>
                             </div>
                         </div>
                         <?php endforeach; ?>
                     </div>
 
+                    <!-- Campos de fecha + resumen (aparecen al seleccionar plan) -->
                     <div id="camposFecha" style="display:none;">
-                        <hr>
+                        <hr class="my-2">
+
+                        <!-- Resumen precio -->
+                        <div class="precio-resumen mb-3 d-none" id="resumenPrecio">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="small text-muted">Total a cobrar</div>
+                                    <div class="fw-bold text-success" id="resumenTotal"></div>
+                                </div>
+                                <div class="text-end d-none" id="bloqueAhorro">
+                                    <div class="small text-success" id="resumenAhorro"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Fecha de inicio</label>
                             <input type="date" class="form-control form-control-sm"
                                    name="fecha_inicio" id="fechaInicio" value="<?= date('Y-m-d') ?>">
                         </div>
                         <div class="mb-2">
-                            <label class="form-label fw-semibold small">Fecha de vencimiento</label>
+                            <label class="form-label fw-semibold small">
+                                Fecha de vencimiento
+                                <small class="text-muted fw-normal">(calculada automáticamente)</small>
+                            </label>
                             <input type="date" class="form-control form-control-sm"
-                                   name="fecha_vencimiento" id="fechaVencimiento">
+                                   name="fecha_vencimiento" id="fechaVencimiento" readonly>
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-semibold small">Notas</label>
@@ -371,12 +445,12 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
                         </button>
                     </div>
 
-                    <!-- Info token al crear -->
-                    <hr class="mt-3">
+                    <hr class="mt-auto mb-0">
                     <div class="d-flex align-items-center gap-2 text-muted small">
                         <i class="fas fa-key text-success"></i>
-                        <span>Se generará un token de API automáticamente al registrar el cliente.</span>
+                        <span>Se generará un token de API automáticamente al registrar.</span>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -398,6 +472,10 @@ body.dark-mode .plan-card.plan-premium  { background:rgba(255,193,7,0.15); }
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// ── Estado global ──
+let periodoActual    = 'mensual';
+let planSeleccionado = null;
+
 // ── Preview logo ──
 function previsualizarLogo(input) {
     if (!input.files || !input.files[0]) return;
@@ -423,7 +501,29 @@ function actualizarIniciales(nombre) {
     ini.textContent = (p[0][0] || '').toUpperCase() + (p[1] ? p[1][0].toUpperCase() : '');
 }
 
-// ── Plan ──
+// ── Selector de período ──
+function seleccionarPeriodo(periodo) {
+    periodoActual = periodo;
+    document.getElementById('tipoPeriodo').value = periodo;
+
+    document.getElementById('btnMensual').classList.toggle('activo', periodo === 'mensual');
+    document.getElementById('btnAnual').classList.toggle('activo', periodo === 'anual');
+
+    // Muestra precio correcto en cada card
+    document.querySelectorAll('.precio-mensual-display').forEach(el => {
+        el.style.display = periodo === 'mensual' ? '' : 'none';
+    });
+    document.querySelectorAll('.precio-anual-display').forEach(el => {
+        el.style.display = periodo === 'anual' ? '' : 'none';
+    });
+
+    if (planSeleccionado) {
+        calcularVencimiento();
+        actualizarResumen();
+    }
+}
+
+// ── Selección de plan ──
 function seleccionarPlan(el) {
     document.querySelectorAll('.plan-card').forEach(c => {
         c.classList.remove('selected');
@@ -431,9 +531,37 @@ function seleccionarPlan(el) {
     });
     el.classList.add('selected');
     el.querySelector('.check-icon')?.classList.remove('d-none');
-    document.getElementById('inputPlanId').value = el.dataset.id;
-    document.getElementById('camposFecha').style.display = 'block';
-    calcularVencimiento(el.dataset.duracion);
+
+    planSeleccionado = {
+        id:          el.dataset.id,
+        nombre:      el.dataset.nombre,
+        duracion:    parseInt(el.dataset.duracion),
+        precio:      parseFloat(el.dataset.precio),
+        precioAnual: parseFloat(el.dataset.precioAnual),
+        ahorro:      parseFloat(el.dataset.ahorro),
+        descuento:   parseFloat(el.dataset.descuento),
+    };
+
+    document.getElementById('inputPlanId').value = planSeleccionado.id;
+
+    // Muestra toggle y campos de fecha
+    document.getElementById('bloqueToggle').style.display = '';
+    document.getElementById('camposFecha').style.display  = 'block';
+
+    // Badge y texto de descuento en botón anual
+    const badge = document.getElementById('badgeDescuento');
+    const texto = document.getElementById('textoDescuento');
+    if (planSeleccionado.descuento > 0) {
+        badge.textContent = planSeleccionado.descuento + '% OFF';
+        badge.classList.remove('d-none');
+        texto.textContent = `Ahorra L.${planSeleccionado.ahorro.toFixed(2)} pagando anualmente.`;
+    } else {
+        badge.classList.add('d-none');
+        texto.textContent = 'Este plan no tiene descuento anual.';
+    }
+
+    calcularVencimiento();
+    actualizarResumen();
 }
 
 function limpiarPlan() {
@@ -441,24 +569,60 @@ function limpiarPlan() {
         c.classList.remove('selected');
         c.querySelector('.check-icon')?.classList.add('d-none');
     });
-    document.getElementById('inputPlanId').value = '';
-    document.getElementById('camposFecha').style.display = 'none';
+    planSeleccionado = null;
+    periodoActual    = 'mensual';
+    document.getElementById('tipoPeriodo').value          = 'mensual';
+    document.getElementById('inputPlanId').value          = '';
+    document.getElementById('bloqueToggle').style.display = 'none';
+    document.getElementById('camposFecha').style.display  = 'none';
+    document.getElementById('resumenPrecio').classList.add('d-none');
+    document.getElementById('btnMensual').classList.add('activo');
+    document.getElementById('btnAnual').classList.remove('activo');
+    document.querySelectorAll('.precio-mensual-display').forEach(el => el.style.display = '');
+    document.querySelectorAll('.precio-anual-display').forEach(el => el.style.display = 'none');
 }
 
-function calcularVencimiento(duracion) {
-    const fi = document.getElementById('fechaInicio');
-    const fv = document.getElementById('fechaVencimiento');
-    if (!fi || !fv) return;
-    const d = new Date(fi.value);
-    d.setDate(d.getDate() + parseInt(duracion || 30));
-    fv.value = d.toISOString().split('T')[0];
+// ── Calcula fecha de vencimiento ──
+function calcularVencimiento() {
+    if (!planSeleccionado) return;
+    const fi = document.getElementById('fechaInicio').value;
+    if (!fi) return;
+    const d = new Date(fi);
+    if (periodoActual === 'anual') {
+        d.setDate(d.getDate() + 365);
+    } else {
+        d.setDate(d.getDate() + planSeleccionado.duracion);
+    }
+    document.getElementById('fechaVencimiento').value = d.toISOString().split('T')[0];
 }
 
-const fi = document.getElementById('fechaInicio');
-if (fi) fi.addEventListener('change', () => {
-    const sel = document.querySelector('.plan-card.selected');
-    if (sel) calcularVencimiento(sel.dataset.duracion);
-});
+// ── Actualiza resumen de precio ──
+function actualizarResumen() {
+    if (!planSeleccionado) return;
+
+    const resumen = document.getElementById('resumenPrecio');
+    resumen.classList.remove('d-none');
+
+    const total = periodoActual === 'anual'
+        ? planSeleccionado.precioAnual
+        : planSeleccionado.precio;
+
+    document.getElementById('resumenTotal').textContent = 'L.' + total.toFixed(2)
+        + (periodoActual === 'anual' ? '/año' : '/mes');
+
+    const bloqueAhorro = document.getElementById('bloqueAhorro');
+    if (periodoActual === 'anual' && planSeleccionado.ahorro > 0) {
+        document.getElementById('resumenAhorro').textContent =
+            'Ahorro: L.' + planSeleccionado.ahorro.toFixed(2);
+        bloqueAhorro.classList.remove('d-none');
+    } else {
+        bloqueAhorro.classList.add('d-none');
+    }
+}
+
+// Recalcula al cambiar fecha de inicio
+const fiInput = document.getElementById('fechaInicio');
+if (fiInput) fiInput.addEventListener('change', calcularVencimiento);
 
 // ── Token API ──
 function copiarToken() {
@@ -474,22 +638,14 @@ function copiarToken() {
 function confirmarRegenerar(clienteId) {
     Swal.fire({
         title: '¿Regenerar token?',
-        html: 'El token anterior <strong>dejará de funcionar inmediatamente</strong>.<br>Deberás actualizar el token en el sistema del cliente.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, regenerar',
-        cancelButtonText: 'Cancelar'
-    }).then(r => {
-        if (!r.isConfirmed) return;
-        llamarRegenerar(clienteId);
-    });
+        html: 'El token anterior <strong>dejará de funcionar inmediatamente</strong>.',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonColor:'#dc3545', cancelButtonColor:'#6c757d',
+        confirmButtonText:'Sí, regenerar', cancelButtonText:'Cancelar'
+    }).then(r => { if (r.isConfirmed) llamarRegenerar(clienteId); });
 }
 
-function generarTokenNuevo(clienteId) {
-    llamarRegenerar(clienteId, true);
-}
+function generarTokenNuevo(clienteId) { llamarRegenerar(clienteId, true); }
 
 function llamarRegenerar(clienteId, esNuevo = false) {
     const fd = new FormData();
@@ -499,25 +655,21 @@ function llamarRegenerar(clienteId, esNuevo = false) {
         .then(data => {
             if (data.success) {
                 Swal.fire({
-                    icon: 'success',
+                    icon:'success',
                     title: esNuevo ? 'Token generado' : 'Token regenerado',
                     html: `<p class="mb-2">Copia el nuevo token:</p>
                            <code class="d-block p-2 bg-light rounded" style="font-size:.75rem;word-break:break-all;">
                                ${data.token}
                            </code>`,
-                    confirmButtonColor: '#005C3E',
-                    confirmButtonText: 'Copiar y cerrar'
-                }).then(() => {
-                    navigator.clipboard.writeText(data.token);
-                    location.reload();
-                });
+                    confirmButtonColor:'#005C3E', confirmButtonText:'Copiar y cerrar'
+                }).then(() => { navigator.clipboard.writeText(data.token); location.reload(); });
             } else {
-                Swal.fire({ icon:'error', title:'Error', text: data.message });
+                Swal.fire({ icon:'error', title:'Error', text:data.message });
             }
         });
 }
 
-// ── Validación del form ──
+// ── Validación ──
 document.getElementById('clienteForm').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value.trim();
     const email  = document.getElementById('email').value.trim();
